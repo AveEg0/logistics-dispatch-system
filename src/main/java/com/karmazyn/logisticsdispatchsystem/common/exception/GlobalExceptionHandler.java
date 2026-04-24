@@ -42,7 +42,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             DriverNotAvailableException.class,
             EmailAlreadyExistsException.class,
-            IllegalStateException.class
+            IllegalStateException.class,
+            IllegalArgumentException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public String handleConflict(RuntimeException ex) {
