@@ -92,7 +92,7 @@ public class DriverService {
 
         driver.setStatus(status);
 
-        return driverMapper.toDto(driverRepository.save(driver));
+        return driverMapper.toDto(driver);
     }
 
     @Transactional
@@ -102,6 +102,6 @@ public class DriverService {
 
         driver.setCurrentLocation(location);
 
-        return driverMapper.toDto(driverRepository.save(driver));
+        return driverMapper.toDto(driver);
     }
 }

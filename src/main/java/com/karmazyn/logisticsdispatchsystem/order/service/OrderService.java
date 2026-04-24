@@ -89,7 +89,7 @@ public class OrderService {
         driver.setStatus(DriverStatus.BUSY);
         driverRepository.save(driver);
 
-        return orderMapper.toDto(orderRepository.save(order));
+        return orderMapper.toDto(order);
     }
 
     /**
@@ -117,7 +117,7 @@ public class OrderService {
             driverRepository.save(driver);
         }
 
-        return orderMapper.toDto(orderRepository.save(order));
+        return orderMapper.toDto(order);
     }
 
     /**

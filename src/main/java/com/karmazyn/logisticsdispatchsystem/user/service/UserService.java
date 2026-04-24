@@ -1,11 +1,15 @@
 package com.karmazyn.logisticsdispatchsystem.user.service;
 
+import com.karmazyn.logisticsdispatchsystem.common.exception.EmailAlreadyExistsException;
 import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotFoundException;
+import com.karmazyn.logisticsdispatchsystem.user.dto.CreateUserRequestDto;
+import com.karmazyn.logisticsdispatchsystem.user.dto.UserResponseDto;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
-import com.karmazyn.logisticsdispatchsystem.user.entity.UserRole;
+import com.karmazyn.logisticsdispatchsystem.user.mapper.UserMapper;
 import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,34 +17,33 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     /**
      * Creates a new user with given role.
-     * Password is stored as plain text for now (will be replaced with hashing later).
      */
     @Transactional
-    public User createUser(String email, String password, UserRole role) {
-
-        // Check if user already exists
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new RuntimeException("Email already exists");
-        }
+    public UserResponseDto createUser(CreateUserRequestDto dto) {
 
         User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setRole(role);
-        user.setEnabled(true);
-        user.setPasswordChanged(false);
+        user.setEmail(dto.getEmail());
+        user.setRole(dto.getRole());
 
-        return userRepository.save(user);
+        // HASH password
+        user.setPasswordHash(
+                passwordEncoder.encode(dto.getPassword())
+        );
+
+        return userMapper.toDto(userRepository.save(user));
     }
 
     /**
      * Finds user by id.
      */
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
+    public UserResponseDto getUserById(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+        return userMapper.toDto(user);
     }
 }
