@@ -1,10 +1,16 @@
 package com.karmazyn.logisticsdispatchsystem.user.entity;
 
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
 import java.time.OffsetDateTime;
 
 @Entity
@@ -36,5 +42,6 @@ public class User {
     private boolean passwordChanged = false;
 
     @Column(name = "created_at", insertable = false, updatable = false)
+    @Generated
     private OffsetDateTime createdAt;
 }

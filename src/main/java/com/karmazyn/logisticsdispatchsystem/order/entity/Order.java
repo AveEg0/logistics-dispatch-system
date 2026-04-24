@@ -4,6 +4,7 @@ import com.karmazyn.logisticsdispatchsystem.driver.entity.Driver;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.time.OffsetDateTime;
@@ -40,6 +41,7 @@ public class Order {
     private User createdBy;
 
     @Column(name = "created_at", insertable = false, updatable = false)
+    @Generated
     private OffsetDateTime createdAt;
 
     private String comment;
