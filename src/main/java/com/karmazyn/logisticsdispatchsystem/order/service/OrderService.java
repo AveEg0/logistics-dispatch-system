@@ -73,7 +73,8 @@ public class OrderService {
     @Transactional
     public OrderResponseDto assignDriver(Long orderId, AssignDriverRequestDto dto) {
 
-        Order order = orderRepository.findById(orderId)
+        // Use pessimistic lock for Order to prevent concurrent assignments to the same order
+        Order order = orderRepository.findByIdForUpdate(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
         // Check if order is in valid state for assignment
@@ -81,7 +82,7 @@ public class OrderService {
             throw new IllegalStateException("Order cannot be assigned in its current state: " + order.getStatus());
         }
 
-        //pessimistic lock to prevent race condition
+        // Use pessimistic lock for Driver to prevent assigning the same driver to multiple orders
         Driver driver = driverRepository.findByIdForUpdate(dto.getDriverId())
                 .orElseThrow(() -> new DriverNotFoundException("Driver not found"));
 
@@ -110,7 +111,8 @@ public class OrderService {
      */
     @Transactional
     public OrderResponseDto cancelOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+        // Lock order to prevent concurrent state transitions
+        Order order = orderRepository.findByIdForUpdate(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
         if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.CANCELLED) {
@@ -138,7 +140,8 @@ public class OrderService {
      */
     @Transactional
     public OrderResponseDto acceptOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+        // Lock order to prevent concurrent state transitions
+        Order order = orderRepository.findByIdForUpdate(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
         if (order.getStatus() != OrderStatus.ASSIGNED) {
@@ -169,7 +172,8 @@ public class OrderService {
     @Transactional
     public OrderResponseDto rejectOrder(Long orderId) {
 
-        Order order = orderRepository.findById(orderId)
+        // Lock order to prevent concurrent state transitions
+        Order order = orderRepository.findByIdForUpdate(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
         if (order.getStatus() != OrderStatus.ASSIGNED) {
@@ -203,7 +207,8 @@ public class OrderService {
     @Transactional
     public OrderResponseDto completeOrder(Long orderId, CompleteOrderDto dto) {
 
-        Order order = orderRepository.findById(orderId)
+        // Lock order to prevent concurrent state transitions
+        Order order = orderRepository.findByIdForUpdate(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
         if (order.getStatus() != OrderStatus.ASSIGNED) {
