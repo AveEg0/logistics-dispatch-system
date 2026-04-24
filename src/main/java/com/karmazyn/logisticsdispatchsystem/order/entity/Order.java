@@ -40,4 +40,6 @@ public class Order {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private String comment;
+
+    private String description;
 }
