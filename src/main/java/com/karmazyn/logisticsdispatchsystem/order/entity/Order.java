@@ -38,4 +38,6 @@ public class Order {
     private User createdBy;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    private String comment;
 }
