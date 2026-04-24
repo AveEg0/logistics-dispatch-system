@@ -1,6 +1,7 @@
 package com.karmazyn.logisticsdispatchsystem.order.controller;
 
-import com.karmazyn.logisticsdispatchsystem.order.dto.CompleteOrderDto;
+import com.karmazyn.logisticsdispatchsystem.order.dto.CompleteOrderRequestDto;
+import com.karmazyn.logisticsdispatchsystem.order.dto.CancelOrderRequestDto;
 import com.karmazyn.logisticsdispatchsystem.order.dto.AssignDriverRequestDto;
 import com.karmazyn.logisticsdispatchsystem.order.dto.CreateOrderRequestDto;
 import com.karmazyn.logisticsdispatchsystem.order.dto.OrderResponseDto;
@@ -43,7 +44,7 @@ public class OrderController {
     @PutMapping("/{orderId}/complete")
     public OrderResponseDto completeOrder(
             @PathVariable Long orderId,
-            @Valid @RequestBody CompleteOrderDto dto
+            @Valid @RequestBody CompleteOrderRequestDto dto
     ) {
         return orderService.completeOrder(orderId, dto);
     }
@@ -52,8 +53,11 @@ public class OrderController {
      * Cancel order
      */
     @PutMapping("/{orderId}/cancel")
-    public OrderResponseDto cancelOrder(@PathVariable Long orderId) {
-        return orderService.cancelOrder(orderId);
+    public OrderResponseDto cancelOrder(
+            @PathVariable Long orderId,
+            @Valid @RequestBody CancelOrderRequestDto dto
+    ) {
+        return orderService.cancelOrder(orderId, dto);
     }
 
     /**

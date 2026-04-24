@@ -7,7 +7,8 @@ import com.karmazyn.logisticsdispatchsystem.driver.entity.Driver;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.DriverStatus;
 import com.karmazyn.logisticsdispatchsystem.driver.repository.DriverRepository;
 import com.karmazyn.logisticsdispatchsystem.order.dto.AssignDriverRequestDto;
-import com.karmazyn.logisticsdispatchsystem.order.dto.CompleteOrderDto;
+import com.karmazyn.logisticsdispatchsystem.order.dto.CancelOrderRequestDto;
+import com.karmazyn.logisticsdispatchsystem.order.dto.CompleteOrderRequestDto;
 import com.karmazyn.logisticsdispatchsystem.order.dto.CreateOrderRequestDto;
 import com.karmazyn.logisticsdispatchsystem.order.dto.OrderResponseDto;
 import com.karmazyn.logisticsdispatchsystem.order.entity.Order;
@@ -52,7 +53,14 @@ public class OrderService {
         Order order = new Order();
         order.setPickupLocation(dto.getPickupLocation());
         order.setDeliveryLocation(dto.getDeliveryLocation());
-        order.setDescription(dto.getDescription());
+
+        String description = dto.getDescription();
+
+        if (description == null || description.isBlank()) {
+            description = "No description provided";
+        }
+
+        order.setDescription(description);
         order.setCreatedBy(user);
         order.setStatus(OrderStatus.CREATED);
 
@@ -106,11 +114,12 @@ public class OrderService {
      * Updates the order status to {@link OrderStatus#CANCELLED} and makes the driver {@link DriverStatus#AVAILABLE}.
      *
      * @param orderId The ID of the order to cancel.
+     * @param dto     The cancellation details.
      * @return The updated order as a {@link OrderResponseDto}.
      * @throws OrderNotFoundException If the order is not found.
      */
     @Transactional
-    public OrderResponseDto cancelOrder(Long orderId) {
+    public OrderResponseDto cancelOrder(Long orderId, CancelOrderRequestDto dto) {
         // Lock order to prevent concurrent state transitions
         Order order = orderRepository.findByIdForUpdate(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
@@ -120,6 +129,12 @@ public class OrderService {
         }
 
         order.setStatus(OrderStatus.CANCELLED);
+
+        String comment = dto.getComment();
+        if (comment == null || comment.isBlank()) {
+            comment = "Order cancelled by dispatcher";
+        }
+        order.setComment(comment);
 
         Driver driver = order.getDriver();
         if (driver != null) {
@@ -205,7 +220,7 @@ public class OrderService {
      * @throws OrderNotFoundException If the order is not found.
      */
     @Transactional
-    public OrderResponseDto completeOrder(Long orderId, CompleteOrderDto dto) {
+    public OrderResponseDto completeOrder(Long orderId, CompleteOrderRequestDto dto) {
 
         // Lock order to prevent concurrent state transitions
         Order order = orderRepository.findByIdForUpdate(orderId)
@@ -217,7 +232,14 @@ public class OrderService {
 
         // Mark order as completed
         order.setStatus(OrderStatus.COMPLETED);
-        order.setComment(dto.getComment());
+
+        String comment = dto.getComment();
+
+        if (comment == null || comment.isBlank()) {
+            comment = "Order completed successfully";
+        }
+
+        order.setComment(comment);
 
         Driver driver = order.getDriver();
 
