@@ -19,7 +19,7 @@ public class OrderController {
     private final OrderService orderService;
 
     /**
-     * Create new order
+     * Create a new order
      */
     @PostMapping
     public OrderResponseDto createOrder(@Valid @RequestBody CreateOrderRequestDto dto) {
@@ -27,7 +27,7 @@ public class OrderController {
     }
 
     /**
-     * Assign driver to order
+     * Assign a driver to order
      */
     @PutMapping("/{orderId}/assign")
     public OrderResponseDto assignDriver(
@@ -46,6 +46,30 @@ public class OrderController {
             @Valid @RequestBody CompleteOrderDto dto
     ) {
         return orderService.completeOrder(orderId, dto);
+    }
+
+    /**
+     * Cancel order
+     */
+    @PutMapping("/{orderId}/cancel")
+    public OrderResponseDto cancelOrder(@PathVariable Long orderId) {
+        return orderService.cancelOrder(orderId);
+    }
+
+    /**
+     * Accept order (by driver)
+     */
+    @PutMapping("/{orderId}/accept")
+    public OrderResponseDto acceptOrder(@PathVariable Long orderId) {
+        return orderService.acceptOrder(orderId);
+    }
+
+    /**
+     * Reject order (by driver)
+     */
+    @PutMapping("/{orderId}/reject")
+    public OrderResponseDto rejectOrder(@PathVariable Long orderId) {
+        return orderService.rejectOrder(orderId);
     }
 
     /**

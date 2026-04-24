@@ -61,7 +61,7 @@ public class OrderService {
 
     /**
      * Assigns a driver to an existing order.
-     * Updates the order status to {@link OrderStatus#ASSIGNED} and the driver status to {@link DriverStatus#BUSY}.
+     * Updates the order status to {@link OrderStatus#ASSIGNED} and the driver status to {@link DriverStatus#RESERVED}.
      *
      * @param orderId  The ID of the order to assign.
      * @param dto      The assignment details.
@@ -76,6 +76,11 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
+        // Check if order is in valid state for assignment
+        if (order.getStatus() != OrderStatus.CREATED) {
+            throw new IllegalStateException("Order cannot be assigned in its current state: " + order.getStatus());
+        }
+
         //pessimistic lock to prevent race condition
         Driver driver = driverRepository.findByIdForUpdate(dto.getDriverId())
                 .orElseThrow(() -> new DriverNotFoundException("Driver not found"));
@@ -85,17 +90,103 @@ public class OrderService {
             throw new DriverNotAvailableException("Driver is not available");
         }
 
-        // Check if order is in valid state for assignment
-        if (order.getStatus() != OrderStatus.CREATED) {
-            throw new IllegalStateException("Order cannot be assigned in its current state: " + order.getStatus());
-        }
-
         order.setDriver(driver);
         order.setStatus(OrderStatus.ASSIGNED);
 
         // Update driver status
-        driver.setStatus(DriverStatus.BUSY);
+        driver.setStatus(DriverStatus.RESERVED);
         driverRepository.save(driver);
+
+        return orderMapper.toDto(order);
+    }
+
+    /**
+     * Cancels an existing order.
+     * Updates the order status to {@link OrderStatus#CANCELLED} and makes the driver {@link DriverStatus#AVAILABLE}.
+     *
+     * @param orderId The ID of the order to cancel.
+     * @return The updated order as a {@link OrderResponseDto}.
+     * @throws OrderNotFoundException If the order is not found.
+     */
+    @Transactional
+    public OrderResponseDto cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+
+        if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("Order cannot be cancelled in its current state: " + order.getStatus());
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        Driver driver = order.getDriver();
+        if (driver != null) {
+            driver.setStatus(DriverStatus.AVAILABLE);
+            driverRepository.save(driver);
+        }
+
+        return orderMapper.toDto(order);
+    }
+
+    /**
+     * Marks an order as in progress by a driver.
+     * Updates the order status to {@link OrderStatus#IN_PROGRESS} and the driver status remains {@link DriverStatus#BUSY}.
+     *
+     * @param orderId The ID of the order to accept.
+     * @return The updated order as a {@link OrderResponseDto}.
+     * @throws OrderNotFoundException If the order is not found.
+     */
+    @Transactional
+    public OrderResponseDto acceptOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+
+        if (order.getStatus() != OrderStatus.ASSIGNED) {
+            throw new IllegalStateException("Order cannot be accepted in its current state: " + order.getStatus());
+        }
+
+        order.setStatus(OrderStatus.IN_PROGRESS);
+
+        Driver driver = order.getDriver();
+        if (driver != null) {
+            driver.setStatus(DriverStatus.BUSY);
+            driverRepository.save(driver);
+        }
+
+        return orderMapper.toDto(order);
+    }
+
+    /**
+     * Rejects an assigned order by a driver.
+     * Resets the order status to {@link OrderStatus#CREATED}, removes the driver from the order,
+     * and makes the driver {@link DriverStatus#AVAILABLE} again.
+     *
+     * @param orderId The ID of the order to reject.
+     * @return The updated order as a {@link OrderResponseDto}.
+     * @throws OrderNotFoundException If the order is not found.
+     * @throws IllegalStateException  If the order is not in {@link OrderStatus#ASSIGNED} state.
+     */
+    @Transactional
+    public OrderResponseDto rejectOrder(Long orderId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+
+        if (order.getStatus() != OrderStatus.ASSIGNED) {
+            throw new IllegalStateException("Order cannot be rejected in its current state: " + order.getStatus());
+        }
+
+        Driver driver = order.getDriver();
+
+        // reset order
+        order.setDriver(null);
+        order.setStatus(OrderStatus.CREATED);
+
+        // driver becomes available again
+        if (driver != null) {
+            driver.setStatus(DriverStatus.AVAILABLE);
+            driverRepository.save(driver);
+        }
 
         return orderMapper.toDto(order);
     }
