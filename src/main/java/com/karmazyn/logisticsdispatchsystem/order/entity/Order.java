@@ -4,6 +4,8 @@ import com.karmazyn.logisticsdispatchsystem.driver.entity.Driver;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -26,6 +28,7 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private OrderStatus status = OrderStatus.CREATED;
 
     @ManyToOne

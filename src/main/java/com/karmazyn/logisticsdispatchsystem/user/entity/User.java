@@ -3,6 +3,8 @@ package com.karmazyn.logisticsdispatchsystem.user.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -26,6 +28,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private UserRole role;
 
     private boolean enabled = true;
