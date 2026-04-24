@@ -3,7 +3,10 @@ package com.karmazyn.logisticsdispatchsystem.driver.service;
 import com.karmazyn.logisticsdispatchsystem.common.exception.DriverNotFoundException;
 import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotFoundException;
 import com.karmazyn.logisticsdispatchsystem.common.exception.InvalidUserRoleException;
+import com.karmazyn.logisticsdispatchsystem.driver.dto.CreateDriverRequestDto;
 import com.karmazyn.logisticsdispatchsystem.driver.dto.DriverResponseDto;
+import com.karmazyn.logisticsdispatchsystem.driver.dto.UpdateDriverCurrentLocationDto;
+import com.karmazyn.logisticsdispatchsystem.driver.dto.UpdateDriverStatusDto;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.Driver;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.DriverStatus;
 import com.karmazyn.logisticsdispatchsystem.driver.mapper.DriverMapper;
@@ -32,9 +35,9 @@ public class DriverService {
      * User must have DRIVER role.
      */
     @Transactional
-    public DriverResponseDto createDriver(String name, Long userId) {
+    public DriverResponseDto createDriver(CreateDriverRequestDto dto) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         // Ensure user has DRIVER role
@@ -43,7 +46,7 @@ public class DriverService {
         }
 
         Driver driver = new Driver();
-        driver.setName(name);
+        driver.setName(dto.getName());
         driver.setStatus(DriverStatus.AVAILABLE);
         driver.setUser(user);
 
@@ -85,22 +88,22 @@ public class DriverService {
      * Updates driver status (AVAILABLE, BUSY, OFFLINE).
      */
     @Transactional
-    public DriverResponseDto updateDriverStatus(Long driverId, DriverStatus status) {
+    public DriverResponseDto updateDriverStatus(Long driverId, UpdateDriverStatusDto dto) {
 
         Driver driver = driverRepository.findByIdForUpdate(driverId)
                 .orElseThrow(() -> new DriverNotFoundException("Driver not found"));
 
-        driver.setStatus(status);
+        driver.setStatus(dto.getDriverStatus());
 
         return driverMapper.toDto(driver);
     }
 
     @Transactional
-    public DriverResponseDto updateDriverCurrentLocation(Long driverId, String location) {
+    public DriverResponseDto updateDriverCurrentLocation(Long driverId, UpdateDriverCurrentLocationDto dto) {
         Driver driver = driverRepository.findByIdForUpdate(driverId)
                 .orElseThrow(() -> new DriverNotFoundException("Driver not found"));
 
-        driver.setCurrentLocation(location);
+        driver.setCurrentLocation(dto.getCurrentLocation());
 
         return driverMapper.toDto(driver);
     }

@@ -20,7 +20,7 @@ public class DriverController {
      */
     @PostMapping
     public DriverResponseDto createDriver(@RequestBody CreateDriverRequestDto dto) {
-        return driverService.createDriver(dto.getName(), dto.getUserId());
+        return driverService.createDriver(dto);
     }
 
     /**
@@ -55,7 +55,7 @@ public class DriverController {
             @PathVariable Long id,
             @RequestBody UpdateDriverStatusDto dto
     ) {
-        return driverService.updateDriverStatus(id, dto.getDriverStatus());
+        return driverService.updateDriverStatus(id, dto);
     }
 
     /**
@@ -66,7 +66,7 @@ public class DriverController {
             @PathVariable Long id,
             @RequestBody UpdateDriverCurrentLocationDto dto
     ) {
-        return driverService.updateDriverCurrentLocation(id, dto.getCurrentLocation());
+        return driverService.updateDriverCurrentLocation(id, dto);
     }
 
     /**
