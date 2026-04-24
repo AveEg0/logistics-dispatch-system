@@ -6,15 +6,23 @@ import com.karmazyn.logisticsdispatchsystem.common.exception.OrderNotFoundExcept
 import com.karmazyn.logisticsdispatchsystem.driver.entity.Driver;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.DriverStatus;
 import com.karmazyn.logisticsdispatchsystem.driver.repository.DriverRepository;
+import com.karmazyn.logisticsdispatchsystem.order.dto.OrderResponseDto;
 import com.karmazyn.logisticsdispatchsystem.order.entity.Order;
 import com.karmazyn.logisticsdispatchsystem.order.entity.OrderStatus;
+import com.karmazyn.logisticsdispatchsystem.order.mapper.OrderMapper;
 import com.karmazyn.logisticsdispatchsystem.order.repository.OrderRepository;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service class for managing orders within the logistics dispatch system.
+ * Handles order creation, driver assignment, completion, and retrieval.
+ */
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -22,12 +30,19 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final DriverRepository driverRepository;
     private final UserRepository userRepository;
+    private final OrderMapper orderMapper;
 
     /**
-     * Crates order for an existing user
+     * Creates a new order for an existing user.
+     *
+     * @param pickup   The pickup location address.
+     * @param delivery The delivery location address.
+     * @param userId   The ID of the user who created the order.
+     * @return The created order as a {@link OrderResponseDto}.
+     * @throws RuntimeException If the user is not found.
      */
     @Transactional
-    public Order createOrder(String pickup, String delivery, Long userId) {
+    public OrderResponseDto createOrder(String pickup, String delivery, Long userId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -38,16 +53,22 @@ public class OrderService {
         order.setCreatedBy(user);
         order.setStatus(OrderStatus.CREATED);
 
-        return orderRepository.save(order);
+        return orderMapper.toDto(orderRepository.save(order));
     }
 
     /**
-     * Assigns driver to an order
-     * Sets the order status to ASSIGNED
-     * Sets the driver status to BUSY
+     * Assigns a driver to an existing order.
+     * Updates the order status to {@link OrderStatus#ASSIGNED} and the driver status to {@link DriverStatus#BUSY}.
+     *
+     * @param orderId  The ID of the order to assign.
+     * @param driverId The ID of the driver to be assigned.
+     * @return The updated order as a {@link OrderResponseDto}.
+     * @throws OrderNotFoundException      If the order is not found.
+     * @throws DriverNotFoundException     If the driver is not found.
+     * @throws DriverNotAvailableException If the driver is not available.
      */
     @Transactional
-    public Order assignDriver(Long orderId, Long driverId) {
+    public OrderResponseDto assignDriver(Long orderId, Long driverId) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
@@ -68,17 +89,19 @@ public class OrderService {
         driver.setStatus(DriverStatus.BUSY);
         driverRepository.save(driver);
 
-        return orderRepository.save(order);
+        return orderMapper.toDto(orderRepository.save(order));
     }
 
     /**
-     * Completes the order
-     * Sets the order status to COMPLETED
-     * Sets the driver status to AVAILABLE
+     * Completes an existing order.
+     * Updates the order status to {@link OrderStatus#COMPLETED} and makes the driver {@link DriverStatus#AVAILABLE}.
+     *
+     * @param orderId The ID of the order to complete.
+     * @return The updated order as a {@link OrderResponseDto}.
+     * @throws OrderNotFoundException If the order is not found.
      */
-
     @Transactional
-    public Order completeOrder(Long orderId) {
+    public OrderResponseDto completeOrder(Long orderId) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
@@ -94,6 +117,33 @@ public class OrderService {
             driverRepository.save(driver);
         }
 
-        return orderRepository.save(order);
+        return orderMapper.toDto(orderRepository.save(order));
+    }
+
+    /**
+     * Retrieves an order by its ID.
+     *
+     * @param id The ID of the order to retrieve.
+     * @return The found order as a {@link OrderResponseDto}.
+     * @throws OrderNotFoundException If the order is not found.
+     */
+    public OrderResponseDto getOrderById(Long id) {
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+
+        return orderMapper.toDto(order);
+    }
+
+    /**
+     * Retrieves a paginated list of all orders.
+     *
+     * @param pageable Pagination and sorting information.
+     * @return A {@link Page} of {@link OrderResponseDto}.
+     */
+    public Page<OrderResponseDto> getAllOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable)
+                .map(orderMapper::toDto);
+
     }
 }
