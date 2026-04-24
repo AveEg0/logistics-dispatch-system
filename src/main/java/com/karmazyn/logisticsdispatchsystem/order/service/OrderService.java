@@ -85,6 +85,11 @@ public class OrderService {
             throw new DriverNotAvailableException("Driver is not available");
         }
 
+        // Check if order is in valid state for assignment
+        if (order.getStatus() != OrderStatus.CREATED) {
+            throw new IllegalStateException("Order cannot be assigned in its current state: " + order.getStatus());
+        }
+
         order.setDriver(driver);
         order.setStatus(OrderStatus.ASSIGNED);
 
@@ -109,6 +114,10 @@ public class OrderService {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+
+        if (order.getStatus() != OrderStatus.ASSIGNED) {
+            throw new IllegalStateException("Order cannot be completed in its current state: " + order.getStatus());
+        }
 
         // Mark order as completed
         order.setStatus(OrderStatus.COMPLETED);

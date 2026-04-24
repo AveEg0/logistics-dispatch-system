@@ -3,6 +3,7 @@ package com.karmazyn.logisticsdispatchsystem.driver.controller;
 import com.karmazyn.logisticsdispatchsystem.driver.dto.CreateDriverRequestDto;
 import com.karmazyn.logisticsdispatchsystem.driver.dto.*;
 import com.karmazyn.logisticsdispatchsystem.driver.service.DriverService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,7 @@ public class DriverController {
      * Create driver (linked to existing USER with DRIVER role)
      */
     @PostMapping
-    public DriverResponseDto createDriver(@RequestBody CreateDriverRequestDto dto) {
+    public DriverResponseDto createDriver(@Valid @RequestBody CreateDriverRequestDto dto) {
         return driverService.createDriver(dto);
     }
 
@@ -53,7 +54,7 @@ public class DriverController {
     @PutMapping("/{id}/status")
     public DriverResponseDto updateStatus(
             @PathVariable Long id,
-            @RequestBody UpdateDriverStatusDto dto
+            @Valid @RequestBody UpdateDriverStatusDto dto
     ) {
         return driverService.updateDriverStatus(id, dto);
     }
@@ -64,7 +65,7 @@ public class DriverController {
     @PutMapping("/{id}/location")
     public DriverResponseDto updateLocation(
             @PathVariable Long id,
-            @RequestBody UpdateDriverCurrentLocationDto dto
+            @Valid @RequestBody UpdateDriverCurrentLocationDto dto
     ) {
         return driverService.updateDriverCurrentLocation(id, dto);
     }

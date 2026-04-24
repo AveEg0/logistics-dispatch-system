@@ -2,52 +2,64 @@ package com.karmazyn.logisticsdispatchsystem.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    //404 - not found
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUser(UserNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    // 400 - Validation Errors
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 
-    @ExceptionHandler(DriverNotFoundException.class)
-    public ResponseEntity<String> handleDriver(DriverNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    // 404 - Not Found
+    @ExceptionHandler({
+            UserNotFoundException.class,
+            DriverNotFoundException.class,
+            OrderNotFoundException.class
+    })
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleNotFound(RuntimeException ex) {
+        return ex.getMessage();
     }
 
-    @ExceptionHandler(OrderNotFoundException.class)
-    public ResponseEntity<String> handleOrder(OrderNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    // 409 - Business Conflict
+    @ExceptionHandler({
+            DriverNotAvailableException.class,
+            EmailAlreadyExistsException.class,
+            IllegalStateException.class
+    })
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleConflict(RuntimeException ex) {
+        return ex.getMessage();
     }
 
-    // 409 - business conflict
-
-    @ExceptionHandler(DriverNotAvailableException.class)
-    public ResponseEntity<String> handleDriverNotAvailable(DriverNotAvailableException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<String> handleEmailExists(EmailAlreadyExistsException ex) {
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(ex.getMessage());
-    }
-
-    // 403 - forbidden
-
+    // 403 - Forbidden
     @ExceptionHandler(InvalidUserRoleException.class)
-    public ResponseEntity<String> handleInvalidRole(InvalidUserRoleException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleForbidden(InvalidUserRoleException ex) {
+        return ex.getMessage();
     }
 
-    // 400 - Bad Request
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleGeneric(RuntimeException ex) {
-        return ResponseEntity.status(400).body(ex.getMessage());
+    // 500 - Generic Error
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleGeneric(Exception ex) {
+        return "An unexpected error occurred: " + ex.getMessage();
     }
 }

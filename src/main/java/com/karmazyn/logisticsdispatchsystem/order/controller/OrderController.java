@@ -5,6 +5,7 @@ import com.karmazyn.logisticsdispatchsystem.order.dto.AssignDriverRequestDto;
 import com.karmazyn.logisticsdispatchsystem.order.dto.CreateOrderRequestDto;
 import com.karmazyn.logisticsdispatchsystem.order.dto.OrderResponseDto;
 import com.karmazyn.logisticsdispatchsystem.order.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,7 @@ public class OrderController {
      * Create new order
      */
     @PostMapping
-    public OrderResponseDto createOrder(@RequestBody CreateOrderRequestDto dto) {
+    public OrderResponseDto createOrder(@Valid @RequestBody CreateOrderRequestDto dto) {
         return orderService.createOrder(dto);
     }
 
@@ -31,7 +32,7 @@ public class OrderController {
     @PutMapping("/{orderId}/assign")
     public OrderResponseDto assignDriver(
             @PathVariable Long orderId,
-            @RequestBody AssignDriverRequestDto dto
+            @Valid @RequestBody AssignDriverRequestDto dto
     ) {
         return orderService.assignDriver(orderId, dto);
     }
@@ -42,7 +43,7 @@ public class OrderController {
     @PutMapping("/{orderId}/complete")
     public OrderResponseDto completeOrder(
             @PathVariable Long orderId,
-            @RequestBody CompleteOrderDto dto
+            @Valid @RequestBody CompleteOrderDto dto
     ) {
         return orderService.completeOrder(orderId, dto);
     }
