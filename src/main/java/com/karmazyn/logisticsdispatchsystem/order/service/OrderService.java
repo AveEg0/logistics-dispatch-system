@@ -226,7 +226,7 @@ public class OrderService {
         Order order = orderRepository.findByIdForUpdate(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
-        if (order.getStatus() != OrderStatus.ASSIGNED) {
+        if (order.getStatus() != OrderStatus.IN_PROGRESS) {
             throw new IllegalStateException("Order cannot be completed in its current state: " + order.getStatus());
         }
 

@@ -44,7 +44,7 @@ public class OrderController {
     @PutMapping("/{orderId}/complete")
     public OrderResponseDto completeOrder(
             @PathVariable Long orderId,
-            @Valid @RequestBody CompleteOrderRequestDto dto
+            @Valid CompleteOrderRequestDto dto
     ) {
         return orderService.completeOrder(orderId, dto);
     }
@@ -55,7 +55,7 @@ public class OrderController {
     @PutMapping("/{orderId}/cancel")
     public OrderResponseDto cancelOrder(
             @PathVariable Long orderId,
-            @Valid @RequestBody CancelOrderRequestDto dto
+            @Valid CancelOrderRequestDto dto
     ) {
         return orderService.cancelOrder(orderId, dto);
     }

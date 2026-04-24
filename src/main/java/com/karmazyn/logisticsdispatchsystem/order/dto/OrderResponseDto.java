@@ -22,4 +22,5 @@ public class OrderResponseDto {
     private Long userId;
 
     private OffsetDateTime createdAt;
+    private String comment;
 }
