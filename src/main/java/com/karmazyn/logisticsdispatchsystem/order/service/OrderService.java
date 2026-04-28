@@ -1,8 +1,6 @@
 package com.karmazyn.logisticsdispatchsystem.order.service;
 
-import com.karmazyn.logisticsdispatchsystem.common.exception.DriverNotAvailableException;
-import com.karmazyn.logisticsdispatchsystem.common.exception.DriverNotFoundException;
-import com.karmazyn.logisticsdispatchsystem.common.exception.OrderNotFoundException;
+import com.karmazyn.logisticsdispatchsystem.common.exception.*;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.Driver;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.DriverStatus;
 import com.karmazyn.logisticsdispatchsystem.driver.repository.DriverRepository;
@@ -16,8 +14,8 @@ import com.karmazyn.logisticsdispatchsystem.order.entity.OrderStatus;
 import com.karmazyn.logisticsdispatchsystem.order.mapper.OrderMapper;
 import com.karmazyn.logisticsdispatchsystem.order.repository.OrderRepository;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
+import com.karmazyn.logisticsdispatchsystem.user.entity.UserRole;
 import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
-import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -42,13 +40,18 @@ public class OrderService {
      *
      * @param dto The order creation details.
      * @return The created order as a {@link OrderResponseDto}.
-     * @throws RuntimeException If the user is not found.
+     * @throws UserNotFoundException If the user is not found.
+     * @throws InvalidUserRoleException If the user is not a dispatcher or admin.
      */
     @Transactional
     public OrderResponseDto createOrder(CreateOrderRequestDto dto) {
 
-        User user = userRepository.findById(dto.getUserId())
+        User user = userRepository.findById(dto.getCreatedByUserId())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (user.getRole() != UserRole.DISPATCHER && user.getRole() != UserRole.ADMIN) {
+            throw new InvalidUserRoleException("User must be a dispatcher or admin to create an order");
+        }
 
         Order order = new Order();
         order.setPickupLocation(dto.getPickupLocation());
@@ -105,6 +108,7 @@ public class OrderService {
         // Update driver status
         driver.setStatus(DriverStatus.RESERVED);
         driverRepository.save(driver);
+        orderRepository.save(order);
 
         return orderMapper.toDto(order);
     }

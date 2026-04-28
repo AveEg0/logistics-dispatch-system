@@ -11,10 +11,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Global exception handler for the application.
+ * Intercepts various exceptions and returns appropriate HTTP response codes and messages.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 400 - Validation Errors
+    /**
+     * Handles validation errors for request bodies.
+     * Returns a map of field names and their corresponding error messages.
+     *
+     * @param ex the validation exception
+     * @return a map containing validation errors
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -27,7 +37,12 @@ public class GlobalExceptionHandler {
         return errors;
     }
 
-    // 404 - Not Found
+    /**
+     * Handles exceptions related to resources that are not found (404 Not Found).
+     *
+     * @param ex the runtime exception containing the error message
+     * @return the error message string
+     */
     @ExceptionHandler({
             UserNotFoundException.class,
             DriverNotFoundException.class,
@@ -38,7 +53,12 @@ public class GlobalExceptionHandler {
         return ex.getMessage();
     }
 
-    // 409 - Business Conflict
+    /**
+     * Handles business logic conflicts or invalid states (409 Conflict).
+     *
+     * @param ex the runtime exception containing the error message
+     * @return the error message string
+     */
     @ExceptionHandler({
             DriverNotAvailableException.class,
             EmailAlreadyExistsException.class,
@@ -50,14 +70,24 @@ public class GlobalExceptionHandler {
         return ex.getMessage();
     }
 
-    // 403 - Forbidden
+    /**
+     * Handles exceptions related to unauthorized role actions (403 Forbidden).
+     *
+     * @param ex the invalid user role exception
+     * @return the error message string
+     */
     @ExceptionHandler(InvalidUserRoleException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleForbidden(InvalidUserRoleException ex) {
         return ex.getMessage();
     }
 
-    // 500 - Generic Error
+    /**
+     * Fallback handler for any unexpected exceptions (500 Internal Server Error).
+     *
+     * @param ex the exception
+     * @return a generic error message string
+     */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleGeneric(Exception ex) {

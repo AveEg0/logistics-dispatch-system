@@ -10,9 +10,18 @@ import com.karmazyn.logisticsdispatchsystem.user.mapper.UserMapper;
 import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Service class for managing system users.
+ * Handles business logic for user registration, retrieval, and password security.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -45,6 +54,16 @@ public class UserService {
         );
 
         return userMapper.toDto(userRepository.save(user));
+    }
+
+    /**
+     * Retrieves all users registered in the system.
+     *
+     * @return a list of all users as {@link UserResponseDto}
+     */
+    public Page<UserResponseDto> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(userMapper::toDto);
     }
 
     /**

@@ -6,6 +6,10 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import lombok.*;
 
+/**
+ * Entity representing a driver profile.
+ * Linked to a User account and tracks availability and location.
+ */
 @Entity
 @Table(name = "drivers")
 @Getter

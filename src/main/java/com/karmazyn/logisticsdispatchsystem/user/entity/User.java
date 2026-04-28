@@ -13,6 +13,10 @@ import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
 
+/**
+ * Entity representing a system user.
+ * Stores authentication details, role, and account status.
+ */
 @Entity
 @Table(name = "users")
 @Getter

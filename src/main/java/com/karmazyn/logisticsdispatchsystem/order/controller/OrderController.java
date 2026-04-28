@@ -6,32 +6,62 @@ import com.karmazyn.logisticsdispatchsystem.order.dto.AssignDriverRequestDto;
 import com.karmazyn.logisticsdispatchsystem.order.dto.CreateOrderRequestDto;
 import com.karmazyn.logisticsdispatchsystem.order.dto.OrderResponseDto;
 import com.karmazyn.logisticsdispatchsystem.order.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controller for managing delivery orders.
+ * Provides endpoints for order creation, driver assignment, and order lifecycle management.
+ */
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
+@Tag(name = "Order Management", description = "Operations related to delivery orders")
 public class OrderController {
 
     private final OrderService orderService;
 
     /**
-     * Create a new order
+     * Creates a new delivery order.
+     *
+     * @param dto the order creation request data
+     * @return the created order details
      */
     @PostMapping
+    @Operation(summary = "Create a new order", description = "Places a new delivery order in the system with status PENDING.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order created"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     public OrderResponseDto createOrder(@Valid @RequestBody CreateOrderRequestDto dto) {
         return orderService.createOrder(dto);
     }
 
     /**
-     * Assign a driver to order
+     * Assigns a specific driver to an order.
+     *
+     * @param orderId the unique identifier of the order
+     * @param dto the driver assignment request data
+     * @return the updated order details
      */
     @PutMapping("/{orderId}/assign")
+    @Operation(summary = "Assign driver to order", description = "Manually assigns a driver to a pending order.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Driver assigned"),
+            @ApiResponse(responseCode = "404", description = "Order or Driver not found"),
+            @ApiResponse(responseCode = "400", description = "Driver not available or invalid order status")
+    })
     public OrderResponseDto assignDriver(
+            @Parameter(description = "ID of the order", example = "1")
             @PathVariable Long orderId,
             @Valid @RequestBody AssignDriverRequestDto dto
     ) {
@@ -39,56 +69,115 @@ public class OrderController {
     }
 
     /**
-     * Complete order
+     * Marks an order as completed.
+     *
+     * @param orderId the unique identifier of the order
+     * @param dto the completion request data (optional comment)
+     * @return the updated order details
      */
     @PutMapping("/{orderId}/complete")
+    @Operation(summary = "Complete order", description = "Marks an in-progress order as COMPLETED.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order completed"),
+            @ApiResponse(responseCode = "404", description = "Order not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid order status for completion")
+    })
     public OrderResponseDto completeOrder(
+            @Parameter(description = "ID of the order", example = "1001")
             @PathVariable Long orderId,
-            @Valid CompleteOrderRequestDto dto
+            @Valid @RequestBody CompleteOrderRequestDto dto
     ) {
         return orderService.completeOrder(orderId, dto);
     }
 
     /**
-     * Cancel order
+     * Cancels an existing order.
+     *
+     * @param orderId the unique identifier of the order
+     * @param dto the cancellation request data (optional comment)
+     * @return the updated order details
      */
     @PutMapping("/{orderId}/cancel")
+    @Operation(summary = "Cancel order", description = "Marks an order as CANCELED. This can only be done for orders in certain states.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order canceled"),
+            @ApiResponse(responseCode = "404", description = "Order not found"),
+            @ApiResponse(responseCode = "400", description = "Order cannot be canceled in its current state")
+    })
     public OrderResponseDto cancelOrder(
+            @Parameter(description = "ID of the order", example = "1001")
             @PathVariable Long orderId,
-            @Valid CancelOrderRequestDto dto
+            @Valid @RequestBody CancelOrderRequestDto dto
     ) {
         return orderService.cancelOrder(orderId, dto);
     }
 
     /**
-     * Accept order (by driver)
+     * Accepts an assigned order (driver action).
+     *
+     * @param orderId the unique identifier of the order
+     * @return the updated order details
      */
     @PutMapping("/{orderId}/accept")
-    public OrderResponseDto acceptOrder(@PathVariable Long orderId) {
+    @Operation(summary = "Accept order", description = "Action for a driver to accept an order that has been assigned to them.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order accepted"),
+            @ApiResponse(responseCode = "404", description = "Order not found"),
+            @ApiResponse(responseCode = "400", description = "Order cannot be accepted (e.g., already accepted or not assigned)")
+    })
+    public OrderResponseDto acceptOrder(
+            @Parameter(description = "ID of the order", example = "1")
+            @PathVariable Long orderId) {
         return orderService.acceptOrder(orderId);
     }
 
     /**
-     * Reject order (by driver)
+     * Rejects an assigned order (driver action).
+     *
+     * @param orderId the unique identifier of the order
+     * @return the updated order details
      */
     @PutMapping("/{orderId}/reject")
-    public OrderResponseDto rejectOrder(@PathVariable Long orderId) {
+    @Operation(summary = "Reject order", description = "Action for a driver to reject an order that has been assigned to them.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order rejected"),
+            @ApiResponse(responseCode = "404", description = "Order not found"),
+            @ApiResponse(responseCode = "400", description = "Order cannot be rejected")
+    })
+    public OrderResponseDto rejectOrder(
+            @Parameter(description = "ID of the order", example = "1")
+            @PathVariable Long orderId) {
         return orderService.rejectOrder(orderId);
     }
 
     /**
-     * Get order by id
+     * Retrieves order details by their unique identifier.
+     *
+     * @param id the unique identifier of the order
+     * @return the order details
      */
     @GetMapping("/{id}")
-    public OrderResponseDto getOrderById(@PathVariable Long id) {
+    @Operation(summary = "Get order by ID", description = "Returns detailed information about a delivery order based on its unique ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order found"),
+            @ApiResponse(responseCode = "404", description = "Order not found")
+    })
+    public OrderResponseDto getOrderById(
+            @Parameter(description = "ID of the order to retrieve", example = "1001")
+            @PathVariable Long id) {
         return orderService.getOrderById(id);
     }
 
     /**
-     * Get all orders
+     * Retrieves a paginated list of all orders.
+     *
+     * @param pageable pagination and sorting information
+     * @return a page of order details
      */
     @GetMapping
-    public Page<OrderResponseDto> getAllOrders(Pageable pageable) {
+    @Operation(summary = "Get all orders", description = "Returns a paginated list of all delivery orders in the system.")
+    public Page<OrderResponseDto> getAllOrders(
+            @Parameter(description = "Pagination and sorting information") Pageable pageable) {
         return orderService.getAllOrders(pageable);
     }
 }

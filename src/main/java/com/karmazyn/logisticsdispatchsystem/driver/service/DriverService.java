@@ -20,6 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service class for managing driver profiles.
+ * Handles business logic for driver registration, status updates, and location tracking.
+ */
 @Service
 @RequiredArgsConstructor
 public class DriverService {
@@ -33,6 +37,11 @@ public class DriverService {
     /**
      * Creates a driver profile for an existing user.
      * User must have DRIVER role.
+     *
+     * @param dto the driver creation request data
+     * @return the created driver details
+     * @throws UserNotFoundException if the user does not exist
+     * @throws InvalidUserRoleException if the user does not have the DRIVER role
      */
     @Transactional
     public DriverResponseDto createDriver(CreateDriverRequestDto dto) {

@@ -9,6 +9,10 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.time.OffsetDateTime;
 
+/**
+ * Entity representing a delivery order.
+ * Tracks pickup/delivery locations, status, assigned driver, and order creator.
+ */
 @Entity
 @Table(name = "orders")
 @Getter
