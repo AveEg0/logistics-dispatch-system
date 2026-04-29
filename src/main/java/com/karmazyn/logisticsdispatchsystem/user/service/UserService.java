@@ -1,6 +1,7 @@
 package com.karmazyn.logisticsdispatchsystem.user.service;
 
 import com.karmazyn.logisticsdispatchsystem.common.exception.EmailAlreadyExistsException;
+import com.karmazyn.logisticsdispatchsystem.common.exception.InvalidPasswordException;
 import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotFoundException;
 import com.karmazyn.logisticsdispatchsystem.user.dto.CreateUserRequestDto;
 import com.karmazyn.logisticsdispatchsystem.user.dto.UpdatePasswordRequestDto;
@@ -100,7 +101,7 @@ public class UserService {
      * @param dto The password update details.
      * @return The updated user as a {@link UserResponseDto}.
      * @throws UserNotFoundException If user is not found.
-     * @throws IllegalArgumentException If old password does not match.
+     * @throws InvalidPasswordException If old password does not match.
      */
     @Transactional
     public UserResponseDto updatePassword(Long id, UpdatePasswordRequestDto dto) {
@@ -109,7 +110,7 @@ public class UserService {
 
         // Verify old password
         if (!passwordEncoder.matches(dto.getOldPassword(), user.getPasswordHash())) {
-            throw new IllegalArgumentException("Invalid old password");
+            throw new InvalidPasswordException("Invalid old password");
         }
 
         // Update password hash

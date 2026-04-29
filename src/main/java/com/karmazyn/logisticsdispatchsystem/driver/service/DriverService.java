@@ -94,7 +94,7 @@ public class DriverService {
     }
 
     /**
-     * Updates driver status (AVAILABLE, BUSY, OFFLINE).
+     * Updates driver status (AVAILABLE, BUSY, OFFLINE, RESERVED).
      */
     @Transactional
     public DriverResponseDto updateDriverStatus(Long driverId, UpdateDriverStatusDto dto) {

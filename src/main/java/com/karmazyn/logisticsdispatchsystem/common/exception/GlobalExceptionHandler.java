@@ -62,11 +62,38 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             DriverNotAvailableException.class,
             EmailAlreadyExistsException.class,
-            IllegalStateException.class,
-            IllegalArgumentException.class
+            IllegalStateException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public String handleConflict(RuntimeException ex) {
+        return ex.getMessage();
+    }
+
+    /**
+     * Handles bad request exceptions (400 Bad Request).
+     *
+     * @param ex the runtime exception containing the error message
+     * @return the error message string
+     */
+    @ExceptionHandler({
+            InvalidPasswordException.class,
+            IllegalArgumentException.class,
+            InvalidPrincipalException.class
+    })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleBadRequest(RuntimeException ex) {
+        return ex.getMessage();
+    }
+
+    /**
+     * Handles unauthorized access (401 Unauthorized).
+     *
+     * @param ex the user not authenticated exception
+     * @return the error message string
+     */
+    @ExceptionHandler(UserNotAuthenticatedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public String handleUnauthorized(UserNotAuthenticatedException ex) {
         return ex.getMessage();
     }
 

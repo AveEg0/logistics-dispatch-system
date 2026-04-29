@@ -1,5 +1,7 @@
 package com.karmazyn.logisticsdispatchsystem.user.controller;
 
+import com.karmazyn.logisticsdispatchsystem.common.exception.InvalidPrincipalException;
+import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotAuthenticatedException;
 import com.karmazyn.logisticsdispatchsystem.user.dto.CreateUserRequestDto;
 import com.karmazyn.logisticsdispatchsystem.user.dto.UpdatePasswordRequestDto;
 import com.karmazyn.logisticsdispatchsystem.user.dto.UserResponseDto;
@@ -13,6 +15,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +27,7 @@ import java.util.List;
  * Controller for managing system users.
  * Provides endpoints for user registration, retrieval, and password updates.
  */
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -96,24 +103,33 @@ public class UserController {
     }
 
     /**
-     * Updates the password for an existing user.
+     * Updates the password for the currently authenticated user.
      *
-     * @param id the unique identifier of the user
      * @param dto the password update request data
      * @return the updated user details
      */
-    @PutMapping("/{id}/password")
-    @Operation(summary = "Update user password", description = "Changes the password for the specified user after verifying the old password.")
+    @PutMapping("/me/password")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Update my password", description = "Changes the password for the currently authenticated user after verifying the old password.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Password successfully updated"),
             @ApiResponse(responseCode = "400", description = "Invalid password or data provided"),
-            @ApiResponse(responseCode = "404", description = "User not found")
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public UserResponseDto updatePassword(
-            @Parameter(description = "ID of the user to update password for", example = "1")
-            @PathVariable Long id,
             @Valid @RequestBody UpdatePasswordRequestDto dto
     ) {
-        return userService.updatePassword(id, dto);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UserNotAuthenticatedException("User not authenticated");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (!(principal instanceof User user)) {
+            throw new InvalidPrincipalException("Invalid principal");
+        }
+        return userService.updatePassword(user.getId(), dto);
     }
 }
