@@ -15,12 +15,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller for managing delivery orders.
  * Provides endpoints for order creation, driver assignment, and order lifecycle management.
  */
+@PreAuthorize("hasAnyRole('ADMIN', 'DISPATCHER')")
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
@@ -118,6 +120,7 @@ public class OrderController {
      * @param orderId the unique identifier of the order
      * @return the updated order details
      */
+    @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/{orderId}/accept")
     @Operation(summary = "Accept order", description = "Action for a driver to accept an order that has been assigned to them.")
     @ApiResponses(value = {
@@ -137,6 +140,7 @@ public class OrderController {
      * @param orderId the unique identifier of the order
      * @return the updated order details
      */
+    @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/{orderId}/reject")
     @Operation(summary = "Reject order", description = "Action for a driver to reject an order that has been assigned to them.")
     @ApiResponses(value = {
@@ -179,5 +183,18 @@ public class OrderController {
     public Page<OrderResponseDto> getAllOrders(
             @Parameter(description = "Pagination and sorting information") Pageable pageable) {
         return orderService.getAllOrders(pageable);
+    }
+
+    /**
+     * Retrieves a paginated list of all orders assigned to the authenticated driver.
+     *
+     * @param pageable pagination and sorting information
+     * @return a page of order details
+     */
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('DRIVER')")
+    public Page<OrderResponseDto> getMyOrders(
+            @Parameter(description = "Pagination and sorting information") Pageable pageable) {
+        return orderService.getDriversOrders(pageable);
     }
 }

@@ -1,6 +1,7 @@
 package com.karmazyn.logisticsdispatchsystem.security.filter;
 
 import com.karmazyn.logisticsdispatchsystem.common.exception.JwtAuthenticationException;
+import com.karmazyn.logisticsdispatchsystem.security.service.JwtAuthService;
 import com.karmazyn.logisticsdispatchsystem.security.service.JwtService;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
@@ -27,11 +28,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private static final String BEARER_PREFIX = "Bearer ";
-    private static final String AUTHORIZATION_HEADER = "Authorization";
+
 
     private final JwtService jwtService;
-    private final UserRepository userRepository;
+    private final JwtAuthService jwtAuthService;
 
     @Override
     protected void doFilterInternal(
@@ -40,7 +40,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @Nonnull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        Optional<String> jwt = extractToken(request);
+        Optional<String> jwt = jwtAuthService.extractToken(request);
 
         if (jwt.isEmpty()) {
             filterChain.doFilter(request, response);
@@ -52,7 +52,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String email = jwtService.extractEmail(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                authenticateUser(request, email);
+                jwtAuthService.authenticateUser(request, email);
             }
         } catch (JwtAuthenticationException e) {
             log.error("Authentication failed: {}", e.getMessage());
@@ -63,27 +63,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private Optional<String> extractToken(HttpServletRequest request) {
-        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
-            return Optional.of(authHeader.substring(BEARER_PREFIX.length()));
-        }
-        return Optional.empty();
-    }
-
-    private void authenticateUser(HttpServletRequest request, String email) {
-        userRepository.findByEmail(email).ifPresent(user -> {
-            UsernamePasswordAuthenticationToken authToken = createAuthToken(user);
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-        });
-    }
-
-    private UsernamePasswordAuthenticationToken createAuthToken(User user) {
-        return new UsernamePasswordAuthenticationToken(
-                user,
-                null,
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
-        );
-    }
 }

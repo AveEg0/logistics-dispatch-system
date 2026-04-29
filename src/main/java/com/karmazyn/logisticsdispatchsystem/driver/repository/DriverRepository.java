@@ -21,4 +21,6 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     Page<Driver> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     Optional<Driver> findByUserEmail(String email);
+
+    Optional<Driver> findByUser(Long userId);
 }

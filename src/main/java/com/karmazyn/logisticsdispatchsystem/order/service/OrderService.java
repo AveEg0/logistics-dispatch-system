@@ -13,6 +13,7 @@ import com.karmazyn.logisticsdispatchsystem.order.entity.Order;
 import com.karmazyn.logisticsdispatchsystem.order.entity.OrderStatus;
 import com.karmazyn.logisticsdispatchsystem.order.mapper.OrderMapper;
 import com.karmazyn.logisticsdispatchsystem.order.repository.OrderRepository;
+import com.karmazyn.logisticsdispatchsystem.security.utils.SecurityUtils;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import com.karmazyn.logisticsdispatchsystem.user.entity.UserRole;
 import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
@@ -21,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * Service class for managing orders within the logistics dispatch system.
@@ -34,6 +37,7 @@ public class OrderService {
     private final DriverRepository driverRepository;
     private final UserRepository userRepository;
     private final OrderMapper orderMapper;
+    private final SecurityUtils securityUtils;
 
     /**
      * Creates a new order for an existing user.
@@ -280,6 +284,15 @@ public class OrderService {
     public Page<OrderResponseDto> getAllOrders(Pageable pageable) {
         return orderRepository.findAll(pageable)
                 .map(orderMapper::toDto);
+
+    }
+
+    public Page<OrderResponseDto> getDriversOrders(Pageable pageable) {
+        User currentUser = securityUtils.getCurrentUser();
+        Optional<Driver> driver = driverRepository.findByUser(currentUser.getId());
+
+        return driver.map(value -> orderRepository.findAllByDriverId(value.getId(), pageable)
+                .map(orderMapper::toDto)).orElseGet(Page::empty);
 
     }
 }

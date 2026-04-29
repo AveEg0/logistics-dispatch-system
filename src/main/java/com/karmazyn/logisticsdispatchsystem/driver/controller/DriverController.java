@@ -12,12 +12,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller for managing driver profiles and their availability.
  * Provides endpoints for driver registration, status updates, and location tracking.
  */
+@PreAuthorize("hasAnyRole('ADMIN, DISPATCHER')")
 @RestController
 @RequestMapping("/drivers")
 @RequiredArgsConstructor
@@ -32,6 +34,7 @@ public class DriverController {
      * @param dto the driver creation request data
      * @return the created driver details
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     @Operation(summary = "Create driver profile", description = "Links a new driver profile to an existing user with the DRIVER role.")
     @ApiResponses(value = {
