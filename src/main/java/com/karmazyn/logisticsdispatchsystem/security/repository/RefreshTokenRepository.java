@@ -1,19 +1,18 @@
 package com.karmazyn.logisticsdispatchsystem.security.repository;
 
 import com.karmazyn.logisticsdispatchsystem.security.entity.RefreshToken;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
     Optional<RefreshToken> findByToken(String token);
 
-    Page<RefreshToken> findAllByUserId(Long userId, Pageable pageable);
+    List<RefreshToken> findAllByUserId(Long userId);
 
     void deleteByUserId(Long userId);
 

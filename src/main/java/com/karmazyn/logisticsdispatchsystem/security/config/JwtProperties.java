@@ -1,5 +1,6 @@
 package com.karmazyn.logisticsdispatchsystem.security.config;
 
+import java.time.Duration;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class JwtProperties {
     private String secretKey;
-    private long accessExpirationTime;
-    private long refreshExpirationTime;
+    private Duration accessExpirationTime;
+    private Duration refreshExpirationTime;
 }

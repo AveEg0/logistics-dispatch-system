@@ -1,6 +1,8 @@
 package com.karmazyn.logisticsdispatchsystem.common.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -77,7 +79,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             InvalidPasswordException.class,
             IllegalArgumentException.class,
-            InvalidPrincipalException.class
+            InvalidPrincipalException.class,
+            InvalidRefreshTokenException.class,
+            RefreshTokenRevokedException.class,
+            RefreshTokenExpiredException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleBadRequest(RuntimeException ex) {
@@ -118,5 +123,10 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleGeneric(Exception ex) {
         return "An unexpected error occurred: " + ex.getMessage();
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handle(AccessDeniedException ex) {
+        return ResponseEntity.status(403).body("Forbidden");
     }
 }
