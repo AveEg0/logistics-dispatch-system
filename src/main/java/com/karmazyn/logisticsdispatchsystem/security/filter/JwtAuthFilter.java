@@ -3,8 +3,6 @@ package com.karmazyn.logisticsdispatchsystem.security.filter;
 import com.karmazyn.logisticsdispatchsystem.common.exception.JwtAuthenticationException;
 import com.karmazyn.logisticsdispatchsystem.security.service.JwtAuthService;
 import com.karmazyn.logisticsdispatchsystem.security.service.JwtService;
-import com.karmazyn.logisticsdispatchsystem.user.entity.User;
-import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,15 +10,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
