@@ -26,8 +26,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
  * Controller for managing system users.
  * Provides endpoints for user registration, retrieval, and password updates.

@@ -1,6 +1,5 @@
 package com.karmazyn.logisticsdispatchsystem.user.repository;
 
-import com.karmazyn.logisticsdispatchsystem.order.entity.Order;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
