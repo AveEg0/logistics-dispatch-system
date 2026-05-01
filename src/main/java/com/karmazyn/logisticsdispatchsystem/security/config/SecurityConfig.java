@@ -1,5 +1,7 @@
 package com.karmazyn.logisticsdispatchsystem.security.config;
 
+import com.karmazyn.logisticsdispatchsystem.security.handler.CustomAccessDeniedHandler;
+import com.karmazyn.logisticsdispatchsystem.security.handler.CustomAuthenticationEntryPoint;
 import com.karmazyn.logisticsdispatchsystem.security.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     /**
      * Password encoder for hashing user passwords
@@ -28,17 +32,28 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers(
+                                "/auth/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()
                 .anyRequest().authenticated())
+                .exceptionHandling(exception ->
+                        exception
+                                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                                .accessDeniedHandler(customAccessDeniedHandler)
+                )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                ;
 
         return http.build();
     }

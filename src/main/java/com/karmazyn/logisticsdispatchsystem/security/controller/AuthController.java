@@ -6,6 +6,7 @@ import com.karmazyn.logisticsdispatchsystem.security.dto.LoginRequest;
 import com.karmazyn.logisticsdispatchsystem.security.dto.AuthResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,20 +23,20 @@ public class AuthController {
 
     @Operation(summary = "Login user", description = "Authenticates a user and returns a JWT access token and a refresh token")
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request) {
-        return authService.login(request);
+    public AuthResponse login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+        return authService.login(request, httpRequest);
     }
 
     @Operation(summary = "Refresh access token", description = "Uses a refresh token to obtain a new JWT access token and a new refresh token (token rotation)")
     @PostMapping("/refresh")
-    public AuthResponse refresh(@RequestBody RefreshRequest request) {
-        return authService.refresh(request.getRefreshToken());
+    public AuthResponse refresh(@RequestBody RefreshRequest request, HttpServletRequest httpRequest) {
+        return authService.refresh(request.getRefreshToken(), httpRequest);
     }
 
     @Operation(summary = "Logout user", description = "Invalidates the user's current session and revokes refresh tokens")
     @PostMapping("/logout")
-    public void logout() {
-        authService.logout();
+    public void logout(HttpServletRequest httpRequest) {
+        authService.logout(httpRequest);
     }
 
 }

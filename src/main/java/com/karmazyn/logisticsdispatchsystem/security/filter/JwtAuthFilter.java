@@ -53,21 +53,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 
             String email = jwtService.extractEmail(token);
-            List<String> roles = jwtService.extractRoles(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                List<GrantedAuthority> authorities = roles.stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .collect(Collectors.toList());
-                log.info("Authorities: {}", authorities);
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                email,
-                                null,
-                                authorities
-                        );
-                SecurityContextHolder.getContext().setAuthentication(auth);
-                log.info("Authorities: {}", auth.getAuthorities());
+                jwtAuthService.authenticateUser(request, email);
             }
         } catch (JwtAuthenticationException e) {
             log.error("Authentication failed: {}", e.getMessage());

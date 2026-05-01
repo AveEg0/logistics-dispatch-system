@@ -1,0 +1,5 @@
+ALTER TABLE security_logs
+    ALTER COLUMN email DROP NOT NULL;
+
+ALTER TABLE user_logs
+    ALTER COLUMN email DROP NOT NULL;

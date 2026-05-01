@@ -1,5 +1,7 @@
 package com.karmazyn.logisticsdispatchsystem.user.controller;
 
+import com.karmazyn.logisticsdispatchsystem.common.audit.annotation.AuditAction;
+import com.karmazyn.logisticsdispatchsystem.common.audit.entity.UserAction;
 import com.karmazyn.logisticsdispatchsystem.common.exception.InvalidPrincipalException;
 import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotAuthenticatedException;
 import com.karmazyn.logisticsdispatchsystem.user.dto.CreateUserRequestDto;
@@ -42,6 +44,7 @@ public class UserController {
      * @param dto the user creation request data
      * @return the created user details
      */
+    @AuditAction(UserAction.CREATE_USER)
     @PostMapping
     @Operation(summary = "Create a new user", description = "Registers a new user with a specified role (ADMIN, DISPATCHER, DRIVER).")
     @ApiResponses(value = {
@@ -108,6 +111,7 @@ public class UserController {
      * @param dto the password update request data
      * @return the updated user details
      */
+    @AuditAction(UserAction.UPDATE_USER_PASSWORD)
     @PutMapping("/me/password")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Update my password", description = "Changes the password for the currently authenticated user after verifying the old password.")

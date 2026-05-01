@@ -1,5 +1,7 @@
 package com.karmazyn.logisticsdispatchsystem.driver.controller;
 
+import com.karmazyn.logisticsdispatchsystem.common.audit.annotation.AuditAction;
+import com.karmazyn.logisticsdispatchsystem.common.audit.entity.UserAction;
 import com.karmazyn.logisticsdispatchsystem.driver.dto.CreateDriverRequestDto;
 import com.karmazyn.logisticsdispatchsystem.driver.dto.*;
 import com.karmazyn.logisticsdispatchsystem.driver.service.DriverService;
@@ -35,6 +37,7 @@ public class DriverController {
      * @return the created driver details
      */
     @PreAuthorize("hasRole('ADMIN')")
+    @AuditAction(UserAction.CREATE_DRIVER)
     @PostMapping
     @Operation(summary = "Create driver profile", description = "Links a new driver profile to an existing user with the DRIVER role.")
     @ApiResponses(value = {
@@ -97,6 +100,8 @@ public class DriverController {
      * @param dto the status update request data
      * @return the updated driver details
      */
+    @AuditAction(UserAction.UPDATE_DRIVER_STATUS)
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/status")
     @Operation(summary = "Update driver status", description = "Updates the current availability status (e.g., AVAILABLE, BUSY, OFFLINE) of a driver.")
     @ApiResponses(value = {
@@ -118,6 +123,9 @@ public class DriverController {
      * @param dto the location update request data
      * @return the updated driver details
      */
+
+    @AuditAction(UserAction.UPDATE_DRIVER_LOCATION)
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/location")
     @Operation(summary = "Update driver location", description = "Updates the real-time location coordinates or address of a driver.")
     @ApiResponses(value = {

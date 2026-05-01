@@ -1,8 +1,13 @@
-package com.karmazyn.logisticsdispatchsystem.common.exception;
+package com.karmazyn.logisticsdispatchsystem.common.exception.handler;
 
+import com.karmazyn.logisticsdispatchsystem.common.exception.*;
+import com.karmazyn.logisticsdispatchsystem.security.handler.SecurityExceptionHandler;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,7 +22,10 @@ import java.util.Map;
  * Intercepts various exceptions and returns appropriate HTTP response codes and messages.
  */
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final SecurityExceptionHandler securityExceptionHandler;
 
     /**
      * Handles validation errors for request bodies.
@@ -101,12 +109,11 @@ public class GlobalExceptionHandler {
         return ex.getMessage();
     }
 
-    /**
-     * Handles exceptions related to unauthorized role actions (403 Forbidden).
-     *
-     * @param ex the invalid user role exception
-     * @return the error message string
-     */
+      /**
+      * Handles exceptions related to unauthorized role actions (403 Forbidden).
+      *
+      * @param ex the invalid user role exception
+      * @return the error message string*/
     @ExceptionHandler(InvalidUserRoleException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleForbidden(InvalidUserRoleException ex) {
@@ -126,7 +133,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<String> handle(AccessDeniedException ex) {
-        return ResponseEntity.status(403).body("Forbidden");
+    public ResponseEntity<String> handle(AccessDeniedException ex, HttpServletRequest request) {
+        return securityExceptionHandler.handleAccessDenied(new AuthorizationDeniedException(ex.getMessage(), () -> false), request);
     }
 }

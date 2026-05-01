@@ -1,5 +1,7 @@
 package com.karmazyn.logisticsdispatchsystem.order.controller;
 
+import com.karmazyn.logisticsdispatchsystem.common.audit.annotation.AuditAction;
+import com.karmazyn.logisticsdispatchsystem.common.audit.entity.UserAction;
 import com.karmazyn.logisticsdispatchsystem.order.dto.CompleteOrderRequestDto;
 import com.karmazyn.logisticsdispatchsystem.order.dto.CancelOrderRequestDto;
 import com.karmazyn.logisticsdispatchsystem.order.dto.AssignDriverRequestDto;
@@ -37,6 +39,7 @@ public class OrderController {
      * @param dto the order creation request data
      * @return the created order details
      */
+    @AuditAction(UserAction.CREATE_ORDER)
     @PostMapping
     @Operation(summary = "Create a new order", description = "Places a new delivery order in the system with status PENDING.")
     @ApiResponses(value = {
@@ -55,6 +58,7 @@ public class OrderController {
      * @param dto the driver assignment request data
      * @return the updated order details
      */
+    @AuditAction(UserAction.ASSIGN_DRIVER)
     @PutMapping("/{orderId}/assign")
     @Operation(summary = "Assign driver to order", description = "Manually assigns a driver to a pending order.")
     @ApiResponses(value = {
@@ -77,6 +81,7 @@ public class OrderController {
      * @param dto the completion request data (optional comment)
      * @return the updated order details
      */
+    @AuditAction(UserAction.COMPLETE_ORDER)
     @PutMapping("/{orderId}/complete")
     @Operation(summary = "Complete order", description = "Marks an in-progress order as COMPLETED.")
     @ApiResponses(value = {
@@ -99,6 +104,7 @@ public class OrderController {
      * @param dto the cancellation request data (optional comment)
      * @return the updated order details
      */
+    @AuditAction(UserAction.CANCEL_ORDER)
     @PutMapping("/{orderId}/cancel")
     @Operation(summary = "Cancel order", description = "Marks an order as CANCELED. This can only be done for orders in certain states.")
     @ApiResponses(value = {
@@ -120,6 +126,7 @@ public class OrderController {
      * @param orderId the unique identifier of the order
      * @return the updated order details
      */
+    @AuditAction(UserAction.ACCEPT_ORDER)
     @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/{orderId}/accept")
     @Operation(summary = "Accept order", description = "Action for a driver to accept an order that has been assigned to them.")
@@ -140,6 +147,7 @@ public class OrderController {
      * @param orderId the unique identifier of the order
      * @return the updated order details
      */
+    @AuditAction(UserAction.REJECT_ORDER)
     @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/{orderId}/reject")
     @Operation(summary = "Reject order", description = "Action for a driver to reject an order that has been assigned to them.")

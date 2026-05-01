@@ -1,0 +1,25 @@
+package com.karmazyn.logisticsdispatchsystem.common.audit.entity;
+
+public enum UserAction {
+
+    CREATE_ORDER,
+    UPDATE_ORDER,
+    DELETE_ORDER,
+    UPDATE_ORDER_STATUS,
+    ACCEPT_ORDER,
+    CANCEL_ORDER,
+    COMPLETE_ORDER,
+    REJECT_ORDER,
+
+    CREATE_USER,
+    UPDATE_USER,
+    DELETE_USER,
+    UPDATE_USER_PASSWORD,
+
+    CREATE_DRIVER,
+    UPDATE_DRIVER,
+    DELETE_DRIVER,
+    ASSIGN_DRIVER,
+    UPDATE_DRIVER_LOCATION,
+    UPDATE_DRIVER_STATUS
+}
