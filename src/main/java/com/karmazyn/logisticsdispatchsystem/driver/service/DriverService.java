@@ -3,14 +3,12 @@ package com.karmazyn.logisticsdispatchsystem.driver.service;
 import com.karmazyn.logisticsdispatchsystem.common.exception.DriverNotFoundException;
 import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotFoundException;
 import com.karmazyn.logisticsdispatchsystem.common.exception.InvalidUserRoleException;
-import com.karmazyn.logisticsdispatchsystem.driver.dto.CreateDriverRequestDto;
-import com.karmazyn.logisticsdispatchsystem.driver.dto.DriverResponseDto;
-import com.karmazyn.logisticsdispatchsystem.driver.dto.UpdateDriverCurrentLocationDto;
-import com.karmazyn.logisticsdispatchsystem.driver.dto.UpdateDriverStatusDto;
+import com.karmazyn.logisticsdispatchsystem.driver.dto.*;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.Driver;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.DriverStatus;
 import com.karmazyn.logisticsdispatchsystem.driver.mapper.DriverMapper;
 import com.karmazyn.logisticsdispatchsystem.driver.repository.DriverRepository;
+import com.karmazyn.logisticsdispatchsystem.driver.specification.DriverSpecification;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import com.karmazyn.logisticsdispatchsystem.user.entity.UserRole;
 import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
@@ -18,6 +16,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,6 +32,7 @@ public class DriverService {
     private final UserRepository userRepository;
     //Mapper
     private final DriverMapper driverMapper;
+    private final DriverSpecification driverSpecification;
 
     /**
      * Creates a driver profile for an existing user.
@@ -68,8 +68,9 @@ public class DriverService {
         return driverMapper.toDto(driver);
     }
 
-    public Page<DriverResponseDto> getAllDrivers(Pageable pageable) {
-        return driverRepository.findAll(pageable)
+    public Page<DriverResponseDto> getDrivers(DriverFilterDto filter, Pageable pageable) {
+        Specification<Driver> specification = driverSpecification.withFilter(filter);
+        return driverRepository.findAll(specification, pageable)
                 .map(driverMapper::toDto);
     }
 
@@ -83,14 +84,6 @@ public class DriverService {
                 .orElseThrow(() -> new DriverNotFoundException("Driver not found"));
 
         return driverMapper.toDto(driver);
-    }
-
-    /**
-     * Returns all available drivers.
-     */
-    public Page<DriverResponseDto> getAvailableDrivers(Pageable pageable) {
-        return driverRepository.findByStatus(DriverStatus.AVAILABLE, pageable)
-                .map(driverMapper::toDto);
     }
 
     /**

@@ -14,6 +14,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  * Controller for managing driver profiles and their availability.
  * Provides endpoints for driver registration, status updates, and location tracking.
  */
-@PreAuthorize("hasAnyRole('ADMIN, DISPATCHER')")
+@PreAuthorize("hasAnyRole('ADMIN', 'DISPATCHER')")
 @RestController
 @RequestMapping("/drivers")
 @RequiredArgsConstructor
@@ -50,29 +52,19 @@ public class DriverController {
     }
 
     /**
-     * Retrieves a paginated list of all drivers.
+     * Retrieves a paginated list of drivers.
      *
      * @param pageable pagination and sorting information
      * @return a page of driver details
      */
     @GetMapping
-    @Operation(summary = "Get all drivers", description = "Returns a paginated list of all registered drivers.")
-    public Page<DriverResponseDto> getAllDrivers(
-            @Parameter(description = "Pagination and sorting information") Pageable pageable) {
-        return driverService.getAllDrivers(pageable);
-    }
-
-    /**
-     * Retrieves a paginated list of currently available drivers.
-     *
-     * @param pageable pagination and sorting information
-     * @return a page of available driver details
-     */
-    @GetMapping("/available")
-    @Operation(summary = "Get available drivers", description = "Returns a paginated list of drivers with status AVAILABLE.")
-    public Page<DriverResponseDto> getAvailableDrivers(
-            @Parameter(description = "Pagination and sorting information") Pageable pageable) {
-        return driverService.getAvailableDrivers(pageable);
+    @Operation(summary = "Get drivers", description = "Returns a paginated list of registered drivers.")
+    public Page<DriverResponseDto> getDrivers(
+            DriverFilterDto filter,
+            @Parameter(description = "Pagination and sorting information")
+            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        return driverService.getDrivers(filter, pageable);
     }
 
     /**

@@ -4,15 +4,12 @@ import com.karmazyn.logisticsdispatchsystem.common.exception.*;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.Driver;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.DriverStatus;
 import com.karmazyn.logisticsdispatchsystem.driver.repository.DriverRepository;
-import com.karmazyn.logisticsdispatchsystem.order.dto.AssignDriverRequestDto;
-import com.karmazyn.logisticsdispatchsystem.order.dto.CancelOrderRequestDto;
-import com.karmazyn.logisticsdispatchsystem.order.dto.CompleteOrderRequestDto;
-import com.karmazyn.logisticsdispatchsystem.order.dto.CreateOrderRequestDto;
-import com.karmazyn.logisticsdispatchsystem.order.dto.OrderResponseDto;
+import com.karmazyn.logisticsdispatchsystem.order.dto.*;
 import com.karmazyn.logisticsdispatchsystem.order.entity.Order;
 import com.karmazyn.logisticsdispatchsystem.order.entity.OrderStatus;
 import com.karmazyn.logisticsdispatchsystem.order.mapper.OrderMapper;
 import com.karmazyn.logisticsdispatchsystem.order.repository.OrderRepository;
+import com.karmazyn.logisticsdispatchsystem.order.specification.OrderSpecification;
 import com.karmazyn.logisticsdispatchsystem.security.utils.SecurityUtils;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import com.karmazyn.logisticsdispatchsystem.user.entity.UserRole;
@@ -21,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -38,6 +36,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final OrderMapper orderMapper;
     private final SecurityUtils securityUtils;
+    private final OrderSpecification orderSpecification;
 
     /**
      * Creates a new order for an existing user.
@@ -276,15 +275,19 @@ public class OrderService {
     }
 
     /**
-     * Retrieves a paginated list of all orders.
+     * Retrieves a paginated list of orders.
      *
      * @param pageable Pagination and sorting information.
      * @return A {@link Page} of {@link OrderResponseDto}.
      */
-    public Page<OrderResponseDto> getAllOrders(Pageable pageable) {
-        return orderRepository.findAll(pageable)
-                .map(orderMapper::toDto);
+    public Page<OrderResponseDto> getOrders(
+            OrderFilterDto filter,
+            Pageable pageable
+    ) {
+        Specification<Order> spec = orderSpecification.withFilter(filter);
 
+        return orderRepository.findAll(spec, pageable)
+                .map(orderMapper::toDto);
     }
 
     public Page<OrderResponseDto> getDriversOrders(Pageable pageable) {

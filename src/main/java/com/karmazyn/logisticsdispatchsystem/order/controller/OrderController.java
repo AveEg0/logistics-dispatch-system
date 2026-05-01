@@ -2,11 +2,7 @@ package com.karmazyn.logisticsdispatchsystem.order.controller;
 
 import com.karmazyn.logisticsdispatchsystem.common.audit.annotation.AuditAction;
 import com.karmazyn.logisticsdispatchsystem.common.audit.entity.UserAction;
-import com.karmazyn.logisticsdispatchsystem.order.dto.CompleteOrderRequestDto;
-import com.karmazyn.logisticsdispatchsystem.order.dto.CancelOrderRequestDto;
-import com.karmazyn.logisticsdispatchsystem.order.dto.AssignDriverRequestDto;
-import com.karmazyn.logisticsdispatchsystem.order.dto.CreateOrderRequestDto;
-import com.karmazyn.logisticsdispatchsystem.order.dto.OrderResponseDto;
+import com.karmazyn.logisticsdispatchsystem.order.dto.*;
 import com.karmazyn.logisticsdispatchsystem.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -181,16 +179,19 @@ public class OrderController {
     }
 
     /**
-     * Retrieves a paginated list of all orders.
+     * Retrieves a paginated list of orders.
      *
      * @param pageable pagination and sorting information
      * @return a page of order details
      */
     @GetMapping
-    @Operation(summary = "Get all orders", description = "Returns a paginated list of all delivery orders in the system.")
-    public Page<OrderResponseDto> getAllOrders(
-            @Parameter(description = "Pagination and sorting information") Pageable pageable) {
-        return orderService.getAllOrders(pageable);
+    @Operation(summary = "Get orders", description = "Returns a paginated list of delivery orders in the system.")
+    public Page<OrderResponseDto> getOrders(
+            OrderFilterDto filter,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        return orderService.getOrders(filter, pageable);
     }
 
     /**

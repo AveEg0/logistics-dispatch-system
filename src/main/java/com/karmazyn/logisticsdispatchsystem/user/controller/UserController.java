@@ -6,6 +6,7 @@ import com.karmazyn.logisticsdispatchsystem.common.exception.InvalidPrincipalExc
 import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotAuthenticatedException;
 import com.karmazyn.logisticsdispatchsystem.user.dto.CreateUserRequestDto;
 import com.karmazyn.logisticsdispatchsystem.user.dto.UpdatePasswordRequestDto;
+import com.karmazyn.logisticsdispatchsystem.user.dto.UserFilterDto;
 import com.karmazyn.logisticsdispatchsystem.user.dto.UserResponseDto;
 import com.karmazyn.logisticsdispatchsystem.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,17 +59,20 @@ public class UserController {
     }
 
     /**
-     * Retrieves a list of all users in the system.
+     * Retrieves a list of users in the system.
      *
      * @return a list of user details
      */
     @GetMapping
-    @Operation(summary = "Get all users", description = "Returns a list of all registered users in the system.")
+    @Operation(summary = "Get users", description = "Returns a list of registered users in the system.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of users")
     })
-    public Page<UserResponseDto> getAllUsers(Pageable pageable) {
-        return userService.getAllUsers(pageable);
+    public Page<UserResponseDto> getUsers(
+            UserFilterDto filter,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        return userService.getUsers(filter, pageable);
     }
 
     /**

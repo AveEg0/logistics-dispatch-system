@@ -5,14 +5,17 @@ import com.karmazyn.logisticsdispatchsystem.common.exception.InvalidPasswordExce
 import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotFoundException;
 import com.karmazyn.logisticsdispatchsystem.user.dto.CreateUserRequestDto;
 import com.karmazyn.logisticsdispatchsystem.user.dto.UpdatePasswordRequestDto;
+import com.karmazyn.logisticsdispatchsystem.user.dto.UserFilterDto;
 import com.karmazyn.logisticsdispatchsystem.user.dto.UserResponseDto;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import com.karmazyn.logisticsdispatchsystem.user.mapper.UserMapper;
 import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
+import com.karmazyn.logisticsdispatchsystem.user.specification.UserSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +32,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserSpecification userSpecification;
     private final BCryptPasswordEncoder passwordEncoder;
 
     /**
@@ -58,12 +62,13 @@ public class UserService {
     }
 
     /**
-     * Retrieves all users registered in the system.
+     * Retrieves users registered in the system.
      *
-     * @return a list of all users as {@link UserResponseDto}
+     * @return a list of users as {@link UserResponseDto}
      */
-    public Page<UserResponseDto> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable)
+    public Page<UserResponseDto> getUsers(UserFilterDto filter, Pageable pageable) {
+        Specification<User> spec = userSpecification.withFilter(filter);
+        return userRepository.findAll(spec, pageable)
                 .map(userMapper::toDto);
     }
 
@@ -105,7 +110,7 @@ public class UserService {
      */
     @Transactional
     public UserResponseDto updatePassword(Long id, UpdatePasswordRequestDto dto) {
-        User user = userRepository.findById(id)
+        User user = userRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         // Verify old password
