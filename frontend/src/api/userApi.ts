@@ -1,4 +1,4 @@
-import type {UserRole} from "../types/user/userRole.ts";
+import type {UserRole} from "../types/users/userRole.ts";
 import {api} from "./apiClient.ts";
 
 

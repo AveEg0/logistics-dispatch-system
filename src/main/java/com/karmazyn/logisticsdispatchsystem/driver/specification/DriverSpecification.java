@@ -17,14 +17,37 @@ public class DriverSpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            //NAME
-            if (filter.getName() != null) {
-                predicates.add(
-                        cb.like(
-                                cb.lower(root.get("name")),
-                                "%" + filter.getName().toLowerCase() + "%"
-                        )
-                );
+            //SEARCH
+            String search = filter.getSearch();
+
+            if (search != null && !search.isBlank()) {
+
+                List<Predicate> searchPredicates = new ArrayList<>();
+
+                String likePattern = "%" + search.toLowerCase() + "%";
+
+                Predicate byName = cb.like(
+                        cb.lower(root.get("name")),
+                        likePattern);
+                searchPredicates.add(byName);
+
+                Predicate byLocation = cb.like(
+                                cb.lower(root.get("currentLocation")),
+                                likePattern);
+                searchPredicates.add(byLocation);
+
+                Predicate byEmail = cb.like(
+                                cb.lower(root.get("user").get("email")),
+                                likePattern);
+                searchPredicates.add(byEmail);
+
+                if (search.matches("\\d+")) {
+                    Predicate byId = cb.equal(root.get("id"), Long.valueOf(search));
+                    searchPredicates.add(byId);
+                }
+                
+                predicates.add(cb.or(searchPredicates.toArray(new Predicate[0])));
+
             }
 
             // STATUS

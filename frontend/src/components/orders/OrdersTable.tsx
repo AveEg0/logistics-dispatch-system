@@ -1,5 +1,5 @@
 import type { Order } from "../../api/ordersApi";
-import {StatusBadge} from "./ui/StatusBadge";
+import {OrdersStatusBadge} from "./ui/OrdersStatusBadge";
 import React from "react";
 
 type Props = {
@@ -65,7 +65,7 @@ export const OrdersTable = ({ orders, onSort, sort }: Props) => {
                     <td style={cell}>{o.deliveryLocation}</td>
 
                     <td>
-                        <StatusBadge status={o.status} />
+                        <OrdersStatusBadge status={o.status} />
                     </td>
 
                     <td style={cell}>{o.driverName ?? "Unassigned"}</td>

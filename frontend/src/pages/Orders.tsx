@@ -3,6 +3,7 @@ import {fetchOrders, type OrderFilter} from "../api/ordersApi";
 import type { Order } from "../api/ordersApi";
 import { OrdersTable } from "../components/orders/OrdersTable";
 import { OrdersFilters } from "../components/orders/OrdersFilters";
+import {Pagination} from "../components/generic/Pagination.tsx";
 
 export const Orders = () => {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -58,7 +59,7 @@ export const Orders = () => {
                 });
 
                 setOrders(data.content);
-                setTotalPages(data.totalPages);
+                setTotalPages(data.page.totalPages);
                 console.log(data.totalPages, " TOTAL PAGES ", totalPages);
             } catch (e) {
                 console.error("Failed to load orders:", e);
@@ -87,21 +88,11 @@ export const Orders = () => {
                 sort={sort}
             />
 
-            <div style={{marginTop: "20px", display: "flex"}}>
-                <button onClick={() => setPage((p) => Math.max(p - 1, 0))}
-                        disabled={page === 0}>
-                    Previous
-                </button>
-                <span style={{margin: "0 10px"}}>Page {page + 1} / {totalPages}</span>
-                <button
-                    disabled={page + 1 >= totalPages}
-                    onClick={() =>{
-                        if (page + 1 < totalPages) setPage((p) => p + 1)
-                    }}
-                >
-                    Next
-                </button>
-            </div>
+            <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+            />
 
         </div>
     );

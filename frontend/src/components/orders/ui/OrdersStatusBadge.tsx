@@ -1,7 +1,7 @@
 import type {OrderStatus} from "../../../types/orders/orderStatus.ts";
 import React from "react";
 
-export const StatusBadge = ({ status }: { status: OrderStatus }) => {
+export const OrdersStatusBadge = ({ status }: { status: OrderStatus }) => {
     const styles: Record<OrderStatus, React.CSSProperties> = {
         CREATED: { background: "#eee", color: "#555" },
         ASSIGNED: { background: "#dbeafe", color: "#1d4ed8" },

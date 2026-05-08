@@ -9,6 +9,7 @@ export const Sidebar = () => {
             <Link to="/">Dashboard</Link>
             <Link to="/orders">Orders</Link>
             <Link to="/users">Users</Link>
+            <Link to="/drivers">Drivers</Link>
         </nav>
     </div>
     );

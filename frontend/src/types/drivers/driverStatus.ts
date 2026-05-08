@@ -1,0 +1,1 @@
+export type DriverStatus = 'AVAILABLE' | 'BUSY' | 'OFFLINE' | 'RESERVED';

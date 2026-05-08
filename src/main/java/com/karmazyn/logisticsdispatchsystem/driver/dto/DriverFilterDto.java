@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class DriverFilterDto {
-    String name;
+    String search;
     DriverStatus status;
 }

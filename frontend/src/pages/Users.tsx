@@ -3,6 +3,7 @@ import {fetchUsers, type User, type UserFilter} from "../api/userApi.ts";
 import {UsersFilters} from "../components/users/UsersFilters.tsx";
 import {Table} from "../components/generic/Table.tsx";
 import {EnabledBadge} from "../components/users/ui/EnabledBadge.tsx";
+import {Pagination} from "../components/generic/Pagination.tsx";
 
 export const Users = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -49,7 +50,7 @@ export const Users = () => {
             });
 
             setUsers(data.content);
-            setTotalPages(data.totalPages);
+            setTotalPages(data.page.totalPages);
         };
         loadUsers();
     }, [page, size, sort, filters, totalPages, debouncedEmail, role]);
@@ -84,25 +85,11 @@ export const Users = () => {
                 ]}
             />
 
-            <div style={{ marginTop: 20 }}>
-                <button
-                    onClick={() => setPage((p) => p - 1)}
-                    disabled={page === 0}
-                >
-                    Prev
-                </button>
-
-                <span style={{ margin: "0 10px" }}>
-          {page + 1} / {totalPages}
-        </span>
-
-                <button
-                    onClick={() => {if (page + 1 < totalPages) setPage((p) => p + 1)}}
-                    disabled={page + 1 >= totalPages}
-                >
-                    Next
-                </button>
-            </div>
+            <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+            />
 
         </div>
     )
