@@ -2,6 +2,7 @@ package com.karmazyn.logisticsdispatchsystem.order.specification;
 
 import com.karmazyn.logisticsdispatchsystem.order.dto.OrderFilterDto;
 import com.karmazyn.logisticsdispatchsystem.order.entity.Order;
+import com.karmazyn.logisticsdispatchsystem.order.entity.OrderStatus;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -46,20 +47,55 @@ public class OrderSpecification {
             // SEARCH (LIKE)
             String search = filter.getSearch();
 
-            if (search != null && search.isBlank()) {
+            if (search != null && !search.isBlank()) {
+
+                List<Predicate> searchPredicates = new ArrayList<>();
 
                 if (search.matches("\\d+")) {
-                    predicates.add(cb.equal(root.get("id"), Long.valueOf(search)));
+                    searchPredicates.add(
+                            cb.equal(root.get("id"), Long.valueOf(search))
+                    );
                 }
 
-                String likePattern = "%" + filter.getSearch().toLowerCase() + "%";
+                // STATUS search
+                try {
+                    OrderStatus statusEnum =
+                            OrderStatus.valueOf(search.toUpperCase());
 
-                Predicate byStatus = cb.like(
-                        cb.lower(root.get("status").as(String.class)),
-                        likePattern
+                    searchPredicates.add(
+                            cb.equal(root.get("status"), statusEnum)
+                    );
+
+                } catch (IllegalArgumentException ignored) {
+                }
+
+                // TEXT search
+                String likePattern = "%" + search.toLowerCase() + "%";
+
+                searchPredicates.add(
+                        cb.like(
+                                cb.lower(root.get("pickupLocation")),
+                                likePattern
+                        )
                 );
 
-                predicates.add(cb.or(byStatus));
+                searchPredicates.add(
+                        cb.like(
+                                cb.lower(root.get("deliveryLocation")),
+                                likePattern
+                        )
+                );
+
+                searchPredicates.add(
+                        cb.like(
+                                cb.lower(root.get("description")),
+                                likePattern
+                        )
+                );
+
+                predicates.add(
+                        cb.or(searchPredicates.toArray(new Predicate[0]))
+                );
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

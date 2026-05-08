@@ -87,10 +87,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             InvalidPasswordException.class,
             IllegalArgumentException.class,
-            InvalidPrincipalException.class,
-            InvalidRefreshTokenException.class,
-            RefreshTokenRevokedException.class,
-            RefreshTokenExpiredException.class
+            InvalidPrincipalException.class
+
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleBadRequest(RuntimeException ex) {
@@ -103,7 +101,11 @@ public class GlobalExceptionHandler {
      * @param ex the user not authenticated exception
      * @return the error message string
      */
-    @ExceptionHandler(UserNotAuthenticatedException.class)
+    @ExceptionHandler({UserNotAuthenticatedException.class,
+            InvalidRefreshTokenException.class,
+            RefreshTokenRevokedException.class,
+            RefreshTokenExpiredException.class}
+    )
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String handleUnauthorized(UserNotAuthenticatedException ex) {
         return ex.getMessage();

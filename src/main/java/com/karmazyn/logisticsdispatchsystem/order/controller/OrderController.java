@@ -187,7 +187,7 @@ public class OrderController {
     @GetMapping
     @Operation(summary = "Get orders", description = "Returns a paginated list of delivery orders in the system.")
     public Page<OrderResponseDto> getOrders(
-            OrderFilterDto filter,
+            @ModelAttribute OrderFilterDto filter,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {

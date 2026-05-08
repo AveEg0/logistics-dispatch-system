@@ -1,15 +1,29 @@
 import React, { useState } from "react";
 import { login } from "../api/auth";
+import {setTokens} from "../utils/token.ts";
+import { useNavigate } from "react-router-dom";
 
 export function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.SyntheticEvent) => {
         e.preventDefault();
 
         try {
             const response = await login({ email, password });
+            console.log("RESPONSE:", response);
+            console.log({
+                accessToken: localStorage.getItem("accessToken"),
+                refreshToken: localStorage.getItem("refreshToken"),
+            });
+            setTokens(response.accessToken, response.refreshToken)
+            console.log({
+                accessToken: localStorage.getItem("accessToken"),
+                refreshToken: localStorage.getItem("refreshToken"),
+            });
+            navigate("/");
 
             console.log("SUCCESS:", response);
 
