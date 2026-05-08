@@ -4,6 +4,7 @@ import {ProtectedRoute} from "../routes/ProtectedRoute.tsx";
 import { Dashboard } from "../pages/Dashboard.tsx";
 import {MainLayout} from "../layout/MainLayout.tsx";
 import {Orders} from "../pages/Orders.tsx";
+import {Users} from "../pages/Users.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
                     {
                         path: "/orders",
                         element: <Orders />
+                    },
+                    {
+                        path: "/users",
+                        element: <Users />
                     }
                 ]
             },

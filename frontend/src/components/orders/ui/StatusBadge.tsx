@@ -1,4 +1,4 @@
-import type {OrderStatus} from "../../types/orders/orderStatus.ts";
+import type {OrderStatus} from "../../../types/orders/orderStatus.ts";
 import React from "react";
 
 export const StatusBadge = ({ status }: { status: OrderStatus }) => {

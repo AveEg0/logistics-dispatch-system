@@ -1,5 +1,5 @@
 import type { Order } from "../../api/ordersApi";
-import {StatusBadge} from "../ui/StatusBadge";
+import {StatusBadge} from "./ui/StatusBadge";
 import React from "react";
 
 type Props = {

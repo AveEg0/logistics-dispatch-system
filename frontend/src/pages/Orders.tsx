@@ -10,12 +10,15 @@ export const Orders = () => {
     const [status] = useState<string>("");
     const [size] = useState(10);
     const [totalPages, setTotalPages] = useState<number>(0);
+    const [debounceTimeout] = useState<number>(500);
 
     const defaultFilters: OrderFilter = {
         search: "",
         status: "",
     };
     const [filters, setFilters] = useState<OrderFilter>(defaultFilters);
+
+    const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
 
     const [sort, setSort] = useState<{
         field: string;
@@ -33,15 +36,26 @@ export const Orders = () => {
         }));
     }
 
-    const hadleResetFilters = () => {
+    const handleResetFilters = () => {
         setFilters(defaultFilters);
         setPage(0);
     }
 
     useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(filters.search);
+        }, debounceTimeout);
+
+        return () => clearTimeout(handler);
+    }, [filters.search, debounceTimeout]);
+
+    useEffect(() => {
         const load = async () => {
             try {
-                const data = await fetchOrders(page, size, sort, filters);
+                const data = await fetchOrders(page, size, sort,{
+                    ...filters,
+                    search: debouncedSearch,
+                });
 
                 setOrders(data.content);
                 setTotalPages(data.totalPages);
@@ -52,7 +66,7 @@ export const Orders = () => {
         };
 
         load();
-    }, [page, size, sort, status, filters, totalPages]);
+    }, [page, size, sort, status, filters, debouncedSearch, totalPages]);
 
     return (
         <div>
@@ -64,7 +78,7 @@ export const Orders = () => {
                     setFilters(newFilters);
                     setPage(0);
                 }}
-                onReset={hadleResetFilters}
+                onReset={handleResetFilters}
             />
 
             <OrdersTable
