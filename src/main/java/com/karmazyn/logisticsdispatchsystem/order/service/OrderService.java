@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -49,8 +50,7 @@ public class OrderService {
     @Transactional
     public OrderResponseDto createOrder(CreateOrderRequestDto dto) {
 
-        User user = userRepository.findById(dto.getCreatedByUserId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = securityUtils.getCurrentUser();
 
         if (user.getRole() != UserRole.DISPATCHER && user.getRole() != UserRole.ADMIN) {
             throw new InvalidUserRoleException("User must be a dispatcher or admin to create an order");

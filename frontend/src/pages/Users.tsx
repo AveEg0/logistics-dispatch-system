@@ -52,8 +52,8 @@ export const Users = () => {
             setUsers(data.content);
             setTotalPages(data.page.totalPages);
         };
-        loadUsers();
-    }, [page, size, sort, filters, totalPages, debouncedEmail, role]);
+        void loadUsers();
+    }, [page, size, sort, filters, debouncedEmail, role]);
 
 
     return (

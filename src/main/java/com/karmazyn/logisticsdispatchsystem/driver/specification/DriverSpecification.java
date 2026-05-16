@@ -26,6 +26,7 @@ public class DriverSpecification {
 
                 String likePattern = "%" + search.toLowerCase() + "%";
 
+
                 Predicate byName = cb.like(
                         cb.lower(root.get("name")),
                         likePattern);
@@ -45,7 +46,7 @@ public class DriverSpecification {
                     Predicate byId = cb.equal(root.get("id"), Long.valueOf(search));
                     searchPredicates.add(byId);
                 }
-                
+
                 predicates.add(cb.or(searchPredicates.toArray(new Predicate[0])));
 
             }

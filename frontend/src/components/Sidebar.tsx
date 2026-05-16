@@ -8,6 +8,7 @@ export const Sidebar = () => {
         <nav style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <Link to="/">Dashboard</Link>
             <Link to="/orders">Orders</Link>
+            <Link to="/orders/create">Create Order</Link>
             <Link to="/users">Users</Link>
             <Link to="/drivers">Drivers</Link>
         </nav>

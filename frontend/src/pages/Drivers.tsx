@@ -46,8 +46,8 @@ export const Drivers = () => {
                 console.error("Failed to load drivers:", e);
             }
         };
-        loadDrivers();
-    }, [page, size, sort, filters, totalPages, debouncedSearch]);
+        void loadDrivers();
+    }, [page, size, sort, filters, debouncedSearch]);
 
     return (
         <div>

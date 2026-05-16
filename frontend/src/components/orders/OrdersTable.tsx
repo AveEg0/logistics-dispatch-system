@@ -1,41 +1,55 @@
 import type { Order } from "../../api/ordersApi";
 import {OrdersStatusBadge} from "./ui/OrdersStatusBadge";
 import React from "react";
+import type {Driver} from "../../api/driverApi.ts";
+import {AssignDriverAction} from "./AssignDriverAction.tsx";
 
 type Props = {
     orders: Order[];
     onSort: (field: string) => void;
     sort: { field: string; direction: "asc" | "desc" };
+    drivers: Driver[];
+    onAssigned: () => void;
 };
 
 const cell: React.CSSProperties = { padding: "12px", verticalAlign: "middle" };
 
-export const OrdersTable = ({ orders, onSort, sort }: Props) => {
+export const OrdersTable = ({ orders, onSort, sort, drivers, onAssigned }: Props) => {
 
-    const renderHeader = (label: string, field: string) => (
-        <th
-            onClick={() => onSort(field)}
-            style={{
-                padding: "12px",
-                textAlign: "center",
-                borderBottom: "2px solid #e5e7eb",
-                fontWeight: "bold",
-                color: "#000",
-                cursor: "pointer",
-            }}
-        >
-            {label}
-            {sort.field === field && (
-                <span style={{
-                    marginLeft: 6,
+    const renderHeader = (label: string, field: string) => {
+        const sortable = field !== "";
+
+        return (
+            <th
+                onClick={() => {
+                    if (sortable) {
+                        onSort(field);
+                    }
+                }}
+                style={{
+                    padding: "12px",
+                    textAlign: "center",
+                    borderBottom: "2px solid #e5e7eb",
                     fontSize: "20px",
                     fontWeight: "bold",
-                    color: "#0a48d5"}}>
+                    color: "#000",
+                    cursor: sortable ? "pointer" : "default",
+                }}
+            >
+                {label}
+                {sortable && sort.field === field && (
+                    <span style={{
+                        marginLeft: 6,
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                        color: "#0a48d5"
+                    }}>
                     {sort.direction === "asc" ? "▲" : "▼"}
                 </span>
-            )}
-        </th>
-    );
+                )}
+            </th>
+        );
+    };
 
     return (
         <div style={{ overflowX: 'auto' }}>
@@ -51,6 +65,7 @@ export const OrdersTable = ({ orders, onSort, sort }: Props) => {
                 {renderHeader("Status", "status")}
                 {renderHeader("Driver", "driverName")}
                 {renderHeader("Created", "createdAt")}
+                {renderHeader("Actions", "")}
             </tr>
             </thead>
 
@@ -70,6 +85,11 @@ export const OrdersTable = ({ orders, onSort, sort }: Props) => {
 
                     <td style={cell}>{o.driverName ?? "Unassigned"}</td>
                     <td style={cell}>{new Date(o.createdAt).toLocaleString()}</td>
+                    <td>
+                        {o.status === "CREATED" && (
+                            <AssignDriverAction orderId={o.id} drivers={drivers} onAssigned={onAssigned}/>
+                        )}
+                    </td>
                 </tr>
             ))}
             </tbody>

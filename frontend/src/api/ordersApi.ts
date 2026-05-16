@@ -18,6 +18,12 @@ export interface OrderFilter {
     to?: string;
 }
 
+export interface CreateOrderRequest {
+    pickupLocation: string;
+    deliveryLocation: string;
+    description: string;
+}
+
 export const fetchOrders = async (
     page: number,
     size: number,
@@ -42,3 +48,23 @@ export const fetchOrders = async (
 
     return res.data;
 };
+
+export const createOrder = async (body: CreateOrderRequest) => {
+    const res = await api.post("/orders", body, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+    });
+
+    return res.data;
+}
+
+export const assignDriver = async (
+    orderId: number, driverId: number) => {
+    const res = await api.put(
+        `/orders/${orderId}/assign`,
+        {driverId},
+        {headers: {Authorization: `Bearer ${localStorage.getItem("accessToken")}`}
+        });
+    return res.data
+}

@@ -1,17 +1,20 @@
-import { useEffect, useState } from "react";
+import {startTransition, useCallback, useEffect, useState} from "react";
 import {fetchOrders, type OrderFilter} from "../api/ordersApi";
 import type { Order } from "../api/ordersApi";
 import { OrdersTable } from "../components/orders/OrdersTable";
 import { OrdersFilters } from "../components/orders/OrdersFilters";
 import {Pagination} from "../components/generic/Pagination.tsx";
+import {type Driver, fetchDrivers} from "../api/driverApi.ts";
 
-export const Orders = () => {
+const Orders = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [page, setPage] = useState(0);
-    const [status] = useState<string>("");
     const [size] = useState(10);
     const [totalPages, setTotalPages] = useState<number>(0);
     const [debounceTimeout] = useState<number>(500);
+    const [drivers, setDrivers] = useState<Driver[]>([]);
+    const DRIVER_STATUS_AVAILABLE = "AVAILABLE";
+    const DRIVER_SELECT_LIMIT = 100;
 
     const defaultFilters: OrderFilter = {
         search: "",
@@ -41,33 +44,59 @@ export const Orders = () => {
         setFilters(defaultFilters);
         setPage(0);
     }
+    
+    const loadOrders = useCallback(async () => {
+
+        try {
+
+            const data = await fetchOrders(
+                page,
+                size,
+                sort,
+                {
+                    ...filters,
+                    search: debouncedSearch,
+                }
+            );
+
+            startTransition(() => {
+                setOrders(data.content);
+                setTotalPages(data.page.totalPages);
+            });
+
+        } catch (e) {
+
+            console.error(
+                "Failed to load orders:",
+                e
+            );
+        }
+    }, [page, size, sort, filters, debouncedSearch]);
 
     useEffect(() => {
+
+        void loadOrders();
+
+    }, [loadOrders]);
+
+    useEffect(() => {
+        const loadDrivers = async () => {
+            const data = await fetchDrivers(0, DRIVER_SELECT_LIMIT,
+                {field: "name", direction: "asc"}, {status: DRIVER_STATUS_AVAILABLE});
+            setDrivers(data.content);
+        }
+        void loadDrivers();
+    }, []);
+
+    useEffect(() => {
+
         const handler = setTimeout(() => {
             setDebouncedSearch(filters.search);
         }, debounceTimeout);
 
         return () => clearTimeout(handler);
     }, [filters.search, debounceTimeout]);
-
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const data = await fetchOrders(page, size, sort,{
-                    ...filters,
-                    search: debouncedSearch,
-                });
-
-                setOrders(data.content);
-                setTotalPages(data.page.totalPages);
-                console.log(data.totalPages, " TOTAL PAGES ", totalPages);
-            } catch (e) {
-                console.error("Failed to load orders:", e);
-            }
-        };
-
-        load();
-    }, [page, size, sort, status, filters, debouncedSearch, totalPages]);
+    
 
     return (
         <div>
@@ -86,6 +115,8 @@ export const Orders = () => {
                 orders={orders}
                 onSort={handleSort}
                 sort={sort}
+                drivers={drivers}
+                onAssigned={loadOrders}
             />
 
             <Pagination
@@ -97,3 +128,4 @@ export const Orders = () => {
         </div>
     );
 };
+export default Orders

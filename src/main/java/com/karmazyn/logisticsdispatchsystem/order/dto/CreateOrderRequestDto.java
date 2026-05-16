@@ -21,8 +21,4 @@ public class CreateOrderRequestDto {
 
     @Schema(description = "Optional description of the package or special instructions", example = "Fragile items, handle with care")
     private String description;
-
-    @NotNull(message = "User ID is required")
-    @Schema(description = "ID of the user who is placing the order", example = "3", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Long createdByUserId;
 }
