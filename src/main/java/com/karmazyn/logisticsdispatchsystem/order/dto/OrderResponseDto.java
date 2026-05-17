@@ -1,5 +1,6 @@
 package com.karmazyn.logisticsdispatchsystem.order.dto;
 
+import com.karmazyn.logisticsdispatchsystem.common.audit.dto.Identifiable;
 import com.karmazyn.logisticsdispatchsystem.order.entity.OrderStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import java.time.OffsetDateTime;
 @Data
 @Builder
 @Schema(description = "Response object representing detailed order information")
-public class OrderResponseDto {
+public class OrderResponseDto implements Identifiable {
     @Schema(description = "Unique identifier of the order", example = "1001")
     private Long id;
 

@@ -1,5 +1,6 @@
 package com.karmazyn.logisticsdispatchsystem.user.dto;
 
+import com.karmazyn.logisticsdispatchsystem.common.audit.dto.Identifiable;
 import com.karmazyn.logisticsdispatchsystem.user.entity.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -10,7 +11,7 @@ import java.time.OffsetDateTime;
  */
 @Data
 @Schema(description = "Response object representing user details")
-public class UserResponseDto {
+public class UserResponseDto implements Identifiable {
     @Schema(description = "Unique identifier of the user", example = "1")
     private Long id;
 

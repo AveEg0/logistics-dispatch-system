@@ -1,6 +1,7 @@
 package com.karmazyn.logisticsdispatchsystem.common.audit.aspect;
 
 import com.karmazyn.logisticsdispatchsystem.common.audit.annotation.AuditAction;
+import com.karmazyn.logisticsdispatchsystem.common.audit.dto.Identifiable;
 import com.karmazyn.logisticsdispatchsystem.common.audit.service.AuditService;
 import com.karmazyn.logisticsdispatchsystem.security.utils.SecurityUtils;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
@@ -94,12 +95,11 @@ public class AuditAspect {
     }
 
     private Long extractEntityId(Object result) {
-        try {
-            Method method = result.getClass().getMethod("getId");
-            return (Long) method.invoke(result);
-        } catch (Exception e) {
-            return null;
+        if (result instanceof Identifiable identifiable) {
+            return identifiable.getId();
         }
+            return null;
+
     }
 
 }

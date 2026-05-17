@@ -1,5 +1,6 @@
 package com.karmazyn.logisticsdispatchsystem.driver.dto;
 
+import com.karmazyn.logisticsdispatchsystem.common.audit.dto.Identifiable;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.DriverStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import lombok.Data;
 @Data
 @Builder
 @Schema(description = "Response object representing driver details")
-public class DriverResponseDto {
+public class DriverResponseDto implements Identifiable {
     @Schema(description = "Unique identifier of the driver profile", example = "1")
     private Long id;
 
