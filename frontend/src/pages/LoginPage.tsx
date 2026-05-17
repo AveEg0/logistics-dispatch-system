@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import { login } from "../api/auth";
 import {setTokens} from "../utils/token.ts";
 import { useNavigate } from "react-router-dom";
+import {fetchMe} from "../api/auth/authService.ts";
+import {useAuth} from "../api/auth/useAuth.ts";
 
 export function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    const {setUserState} = useAuth();
 
     const handleSubmit = async (e: React.SyntheticEvent) => {
         e.preventDefault();
@@ -23,6 +26,11 @@ export function LoginPage() {
                 accessToken: localStorage.getItem("accessToken"),
                 refreshToken: localStorage.getItem("refreshToken"),
             });
+
+            const me = await fetchMe();
+            setUserState(me);
+            console.log("CURRENT USER:", me);
+
             navigate("/");
 
             console.log("SUCCESS:", response);

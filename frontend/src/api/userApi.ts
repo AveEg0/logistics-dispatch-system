@@ -8,6 +8,7 @@ export interface User {
     role: UserRole;
     enabled: boolean;
     createdAt: string;
+    driverId?: number | null;
 }
 
 export interface UserFilter {
