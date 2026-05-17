@@ -29,9 +29,6 @@ export const fetchDrivers = async (
             sort: `${sort.field},${sort.direction}`,
             ...(filters.search && { search: filters.search }),
             ...(filters.status && { status: filters.status }),
-        },
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         }
     });
     return res.data;

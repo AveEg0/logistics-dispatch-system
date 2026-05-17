@@ -40,21 +40,14 @@ export const fetchOrders = async (
             ...(filters.driverId && { driverId: filters.driverId }),
             ...(filters.from && { from: filters.from }),
             ...(filters.to && { to: filters.to }),
-        },
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
+        }
     });
 
     return res.data;
 };
 
 export const createOrder = async (body: CreateOrderRequest) => {
-    const res = await api.post("/orders", body, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-    });
+    const res = await api.post("/orders", body);
 
     return res.data;
 }
@@ -63,8 +56,6 @@ export const assignDriver = async (
     orderId: number, driverId: number) => {
     const res = await api.put(
         `/orders/${orderId}/assign`,
-        {driverId},
-        {headers: {Authorization: `Bearer ${localStorage.getItem("accessToken")}`}
-        });
+        {driverId});
     return res.data
 }

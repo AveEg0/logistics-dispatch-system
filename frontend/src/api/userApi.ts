@@ -29,9 +29,6 @@ export const fetchUsers = async (
             sort: `${sort.field},${sort.direction}`,
             ...(filters.email && { email: filters.email }),
             ...(filters.role && { role: filters.role }),
-        },
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         }
     });
 
