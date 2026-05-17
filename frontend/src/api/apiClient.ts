@@ -1,20 +1,21 @@
 import axios from "axios";
-import {clearTokens, getAccessToken, getRefreshToken, setTokens} from "../utils/token.ts";
+import {clearAccessToken, getAccessToken, setAccessToken} from "../utils/token.ts";
 import {refresh} from "./auth";
 
 export const api = axios.create({
     baseURL: "http://localhost:8080",
+    withCredentials: true,
 });
 
 let isRefreshing = false;
-let failedQueue: any[] = [];
+let failedQueue: Array<{ resolve: (token: string) => void; reject: (err?: unknown) => void; }> = [];
 
 const processQueue = (token: string | null) => {
     failedQueue.forEach((prom) => {
         if (token) {
             prom.resolve(token);
         } else {
-          prom.reject();
+          prom.reject(new Error('Session expired'));
         }
     });
     failedQueue = [];
@@ -48,16 +49,11 @@ api.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                const refreshToken = getRefreshToken();
 
-                if (!refreshToken) {
-                    throw new Error('Refresh token not found');
-                }
-                const authResponse = await refresh(refreshToken);
+                const authResponse = await refresh();
                 const newAccessToken = authResponse.accessToken;
-                const newRefreshToken = authResponse.refreshToken;
 
-                setTokens(newAccessToken, newRefreshToken);
+                setAccessToken(newAccessToken);
 
                 api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
 
@@ -67,8 +63,7 @@ api.interceptors.response.use(
                 return api(originalRequest);
             } catch (e) {
                 processQueue(null);
-                console.error('Refresh token error:', e);
-                clearTokens();
+                clearAccessToken();
                 window.location.href = "/login";
                 return Promise.reject(e);
             } finally {

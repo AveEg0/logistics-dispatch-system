@@ -6,9 +6,10 @@ export const login = async (data: LoginRequest) : Promise<AuthResponse> => {
     return response.data;
 };
 
-export const refresh = async (
-    refreshToken: string) : Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>("/auth/refresh", {refreshToken});
+export const refresh = async () : Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>("/auth/refresh");
     return response.data;
 
 };
+
+export const logout = async (): Promise<void> => await api.post("/auth/logout");

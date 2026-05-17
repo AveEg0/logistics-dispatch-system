@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { login } from "../api/auth";
-import {setTokens} from "../utils/token.ts";
 import { useNavigate } from "react-router-dom";
 import {fetchMe} from "../api/auth/authService.ts";
 import {useAuth} from "../api/auth/useAuth.ts";
+import {setAccessToken} from "../utils/token.ts";
 
 export function LoginPage() {
     const [email, setEmail] = useState("");
@@ -17,15 +17,9 @@ export function LoginPage() {
         try {
             const response = await login({ email, password });
             console.log("RESPONSE:", response);
-            console.log({
-                accessToken: localStorage.getItem("accessToken"),
-                refreshToken: localStorage.getItem("refreshToken"),
-            });
-            setTokens(response.accessToken, response.refreshToken)
-            console.log({
-                accessToken: localStorage.getItem("accessToken"),
-                refreshToken: localStorage.getItem("refreshToken"),
-            });
+
+            setAccessToken(response.accessToken);
+
 
             const me = await fetchMe();
             setUserState(me);

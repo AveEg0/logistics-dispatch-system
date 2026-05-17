@@ -5,5 +5,4 @@ export type LoginRequest = {
 
 export type AuthResponse = {
     accessToken: string ;
-    refreshToken: string;
 };

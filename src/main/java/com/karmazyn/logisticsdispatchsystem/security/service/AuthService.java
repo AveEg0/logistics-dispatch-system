@@ -9,6 +9,7 @@ import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotFoundExcepti
 import com.karmazyn.logisticsdispatchsystem.security.dto.LoginRequest;
 import com.karmazyn.logisticsdispatchsystem.security.dto.AuthResponse;
 import com.karmazyn.logisticsdispatchsystem.security.entity.RefreshToken;
+import com.karmazyn.logisticsdispatchsystem.security.utils.LoginResult;
 import com.karmazyn.logisticsdispatchsystem.security.utils.SecurityUtils;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
@@ -34,7 +35,7 @@ public class AuthService {
     private final String SUCCESS = "SUCCESS";
     private final String INVALID_PRINCIPAL = "INVALID_PRINCIPAL";
 
-    public AuthResponse login(LoginRequest request, HttpServletRequest httpRequest) {
+    public LoginResult login(LoginRequest request, HttpServletRequest httpRequest) {
 
         String ip = httpRequest.getRemoteAddr();
         String userAgent = httpRequest.getHeader("User-Agent");
@@ -83,7 +84,7 @@ public class AuthService {
                     )
             );
 
-            return new AuthResponse(accessToken, refreshToken.getToken());
+            return new LoginResult(accessToken, refreshToken.getToken());
 
         } catch (Exception e) {
 
@@ -101,7 +102,7 @@ public class AuthService {
         }
     }
 
-    public AuthResponse refresh(String refreshToken, HttpServletRequest request) {
+    public LoginResult refresh(String refreshToken, HttpServletRequest request) {
 
         String ip = request.getRemoteAddr();
         String userAgent = request.getHeader("User-Agent");
@@ -127,7 +128,7 @@ public class AuthService {
                     )
             );
 
-            return new AuthResponse(newAccess, newRefresh.getToken());
+            return new LoginResult(newAccess, newRefresh.getToken());
 
         } catch (Exception e) {
 

@@ -1,20 +1,11 @@
-const ACCESS_TOKEN = "accessToken";
-const REFRESH_TOKEN = "refreshToken";
+let inMemoryAccessToken: string | null = null;
 
-export const setTokens = (accessToken: string, refreshToken: string) => {
-    localStorage.setItem(ACCESS_TOKEN, accessToken);
-    localStorage.setItem(REFRESH_TOKEN, refreshToken);
+export const setAccessToken = (token: string): void => {
+  inMemoryAccessToken = token;
 };
 
-export const getAccessToken = () => {
-    return localStorage.getItem(ACCESS_TOKEN);
-}
+export const getAccessToken = (): string | null => inMemoryAccessToken;
 
-export const getRefreshToken = () => {
-    return localStorage.getItem(REFRESH_TOKEN);
-}
-
-export const clearTokens = () => {
-    localStorage.removeItem(ACCESS_TOKEN);
-    localStorage.removeItem(REFRESH_TOKEN);
+export const clearAccessToken = (): void => {
+  inMemoryAccessToken = null;
 };
