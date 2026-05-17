@@ -287,15 +287,6 @@ public class OrderService {
                 .map(orderMapper::toDto);
     }
 
-    public Page<OrderResponseDto> getDriversOrders(Pageable pageable) {
-        User currentUser = securityUtils.getCurrentUser();
-        Optional<Driver> driver = driverRepository.findByUser(currentUser.getId());
-
-        return driver.map(value -> orderRepository.findAllByDriverId(value.getId(), pageable)
-                .map(orderMapper::toDto)).orElseGet(Page::empty);
-
-    }
-
     public OrderResponseDto getCurrentOrderForDriver() {
         User user = securityUtils.getCurrentUser();
         Driver driver = driverRepository.findByUserId(user.getId())

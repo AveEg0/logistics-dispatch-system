@@ -127,7 +127,7 @@ public class UserService {
     public MeResponseDto getCurrentUser() {
         User user = securityUtils.getCurrentUser();
 
-        Driver driver = driverRepository.findByUser(user.getId()).orElse(null);
+        Driver driver = driverRepository.findByUserId(user.getId()).orElse(null);
         return MeResponseDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())

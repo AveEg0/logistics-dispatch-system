@@ -2,7 +2,6 @@ package com.karmazyn.logisticsdispatchsystem.common.audit.controller;
 
 import com.karmazyn.logisticsdispatchsystem.common.audit.dto.UserLogFilterDto;
 import com.karmazyn.logisticsdispatchsystem.common.audit.dto.UserLogResponseDto;
-import com.karmazyn.logisticsdispatchsystem.common.audit.entity.UserLog;
 import com.karmazyn.logisticsdispatchsystem.common.audit.service.UserLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

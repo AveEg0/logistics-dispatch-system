@@ -21,7 +21,6 @@ public class SecurityLog {
 
     private Long userId;
 
-    @Column(nullable = false)
     private String email;
 
     @Enumerated(EnumType.STRING)

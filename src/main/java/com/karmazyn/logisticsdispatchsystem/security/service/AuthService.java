@@ -87,6 +87,7 @@ public class AuthService {
 
         } catch (Exception e) {
 
+            securityLogService.log(
             securityLogService.buildLog(
                             SecurityAction.LOGIN,
                             null,
@@ -94,8 +95,8 @@ public class AuthService {
                             false,
                             httpRequest,
                             e.getMessage()
-                    );
-
+                    )
+            );
             throw e;
         }
     }

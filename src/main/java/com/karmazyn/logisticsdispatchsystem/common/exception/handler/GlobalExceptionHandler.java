@@ -101,10 +101,7 @@ public class GlobalExceptionHandler {
      * @param ex the user not authenticated exception
      * @return the error message string
      */
-    @ExceptionHandler({UserNotAuthenticatedException.class,
-            InvalidRefreshTokenException.class,
-            RefreshTokenRevokedException.class,
-            RefreshTokenExpiredException.class}
+    @ExceptionHandler({UserNotAuthenticatedException.class}
     )
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String handleUnauthorized(UserNotAuthenticatedException ex) {
