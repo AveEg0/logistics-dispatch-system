@@ -32,6 +32,7 @@ public class DriverService {
     private final UserRepository userRepository;
     //Mapper
     private final DriverMapper driverMapper;
+    //Specification
     private final DriverSpecification driverSpecification;
 
     /**
@@ -109,4 +110,5 @@ public class DriverService {
 
         return driverMapper.toDto(driver);
     }
+
 }

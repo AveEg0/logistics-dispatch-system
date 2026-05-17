@@ -17,4 +17,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     Optional<Order> findByIdForUpdate(Long id);
 
     Page<Order> findAllByDriverId(Long driverId, Pageable pageable);
+
+    Optional<Order> findByDriverId(Long id);
 }

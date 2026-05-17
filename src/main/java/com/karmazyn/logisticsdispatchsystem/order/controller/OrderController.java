@@ -195,15 +195,13 @@ public class OrderController {
     }
 
     /**
-     * Retrieves a paginated list of all orders assigned to the authenticated driver.
+     * Retrieves the current order assigned to the authenticated driver.
      *
-     * @param pageable pagination and sorting information
-     * @return a page of order details
+     * @return an order
      */
-    @GetMapping("/my")
+    @GetMapping("/my-current")
     @PreAuthorize("hasRole('DRIVER')")
-    public Page<OrderResponseDto> getMyOrders(
-            @Parameter(description = "Pagination and sorting information") Pageable pageable) {
-        return orderService.getDriversOrders(pageable);
+    public OrderResponseDto getMyCurrentOrder() {
+        return orderService.getCurrentOrderForDriver();
     }
 }

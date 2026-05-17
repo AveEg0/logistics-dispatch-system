@@ -4,10 +4,7 @@ import com.karmazyn.logisticsdispatchsystem.common.audit.annotation.AuditAction;
 import com.karmazyn.logisticsdispatchsystem.common.audit.entity.UserAction;
 import com.karmazyn.logisticsdispatchsystem.common.exception.InvalidPrincipalException;
 import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotAuthenticatedException;
-import com.karmazyn.logisticsdispatchsystem.user.dto.CreateUserRequestDto;
-import com.karmazyn.logisticsdispatchsystem.user.dto.UpdatePasswordRequestDto;
-import com.karmazyn.logisticsdispatchsystem.user.dto.UserFilterDto;
-import com.karmazyn.logisticsdispatchsystem.user.dto.UserResponseDto;
+import com.karmazyn.logisticsdispatchsystem.user.dto.*;
 import com.karmazyn.logisticsdispatchsystem.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -71,6 +68,11 @@ public class UserController {
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable) {
         return userService.getUsers(filter, pageable);
+    }
+
+    @GetMapping("/me")
+    public MeResponseDto getMe() {
+        return userService.getCurrentUser();
     }
 
     /**

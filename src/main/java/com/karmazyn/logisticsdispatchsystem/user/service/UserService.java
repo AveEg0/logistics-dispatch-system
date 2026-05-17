@@ -3,10 +3,10 @@ package com.karmazyn.logisticsdispatchsystem.user.service;
 import com.karmazyn.logisticsdispatchsystem.common.exception.EmailAlreadyExistsException;
 import com.karmazyn.logisticsdispatchsystem.common.exception.InvalidPasswordException;
 import com.karmazyn.logisticsdispatchsystem.common.exception.UserNotFoundException;
-import com.karmazyn.logisticsdispatchsystem.user.dto.CreateUserRequestDto;
-import com.karmazyn.logisticsdispatchsystem.user.dto.UpdatePasswordRequestDto;
-import com.karmazyn.logisticsdispatchsystem.user.dto.UserFilterDto;
-import com.karmazyn.logisticsdispatchsystem.user.dto.UserResponseDto;
+import com.karmazyn.logisticsdispatchsystem.driver.entity.Driver;
+import com.karmazyn.logisticsdispatchsystem.driver.repository.DriverRepository;
+import com.karmazyn.logisticsdispatchsystem.security.utils.SecurityUtils;
+import com.karmazyn.logisticsdispatchsystem.user.dto.*;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import com.karmazyn.logisticsdispatchsystem.user.mapper.UserMapper;
 import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
@@ -28,9 +28,11 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final DriverRepository driverRepository;
     private final UserMapper userMapper;
     private final UserSpecification userSpecification;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final SecurityUtils securityUtils;
 
     /**
      * Creates a new user with given role.
@@ -120,5 +122,17 @@ public class UserService {
         user.setPasswordChanged(true);
 
         return userMapper.toDto(user);
+    }
+
+    public MeResponseDto getCurrentUser() {
+        User user = securityUtils.getCurrentUser();
+
+        Driver driver = driverRepository.findByUser(user.getId()).orElse(null);
+        return MeResponseDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .driverId(driver != null ? driver.getId() : null)
+                .build();
     }
 }

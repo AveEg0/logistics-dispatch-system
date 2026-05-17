@@ -13,13 +13,11 @@ import com.karmazyn.logisticsdispatchsystem.order.specification.OrderSpecificati
 import com.karmazyn.logisticsdispatchsystem.security.utils.SecurityUtils;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import com.karmazyn.logisticsdispatchsystem.user.entity.UserRole;
-import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -34,7 +32,6 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final DriverRepository driverRepository;
-    private final UserRepository userRepository;
     private final OrderMapper orderMapper;
     private final SecurityUtils securityUtils;
     private final OrderSpecification orderSpecification;
@@ -297,5 +294,16 @@ public class OrderService {
         return driver.map(value -> orderRepository.findAllByDriverId(value.getId(), pageable)
                 .map(orderMapper::toDto)).orElseGet(Page::empty);
 
+    }
+
+    public OrderResponseDto getCurrentOrderForDriver() {
+        User user = securityUtils.getCurrentUser();
+        Driver driver = driverRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new DriverNotFoundException("Driver not found"));
+
+        Order order = orderRepository.findByDriverId(driver.getId())
+                .orElseThrow(() -> new OrderNotFoundException("No current order found for driver"));
+
+        return orderMapper.toDto(order);
     }
 }
