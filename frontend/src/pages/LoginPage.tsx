@@ -25,7 +25,14 @@ export function LoginPage() {
             setUserState(me);
             console.log("CURRENT USER:", me);
 
-            navigate("/");
+            if (me!= null && me.role === "DRIVER") {
+
+                navigate("/driver");
+
+            } else {
+
+                navigate("/");
+            }
 
             console.log("SUCCESS:", response);
 

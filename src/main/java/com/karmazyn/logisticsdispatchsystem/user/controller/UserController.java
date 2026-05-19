@@ -70,6 +70,7 @@ public class UserController {
         return userService.getUsers(filter, pageable);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
     public MeResponseDto getMe() {
         return userService.getCurrentUser();

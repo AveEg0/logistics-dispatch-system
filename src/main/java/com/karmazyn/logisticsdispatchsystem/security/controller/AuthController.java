@@ -1,6 +1,5 @@
 package com.karmazyn.logisticsdispatchsystem.security.controller;
 
-import com.karmazyn.logisticsdispatchsystem.security.dto.RefreshRequest;
 import com.karmazyn.logisticsdispatchsystem.security.service.AuthService;
 import com.karmazyn.logisticsdispatchsystem.security.dto.LoginRequest;
 import com.karmazyn.logisticsdispatchsystem.security.dto.AuthResponse;
@@ -40,12 +39,11 @@ public class AuthController {
     @Operation(summary = "Refresh access token", description = "Uses a refresh token to obtain a new JWT access token and a new refresh token (token rotation)")
     @PostMapping("/refresh")
     public AuthResponse refresh(
-            @RequestBody RefreshRequest request,
             HttpServletRequest httpRequest,
             HttpServletResponse response) {
 
         String refreshToken = cookieUtils.extractRefreshTokenFromCookie(httpRequest);
-        LoginResult loginResult = authService.refresh(request.getRefreshToken(), httpRequest);
+        LoginResult loginResult = authService.refresh(refreshToken, httpRequest);
         return new AuthResponse(loginResult.getAccessToken());
     }
 

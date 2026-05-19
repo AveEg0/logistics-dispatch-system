@@ -5,6 +5,7 @@ export interface Order {
     id: number;
     pickupLocation: string;
     deliveryLocation: string;
+    description: string;
     status: OrderStatus;
     driverName?: string;
     createdAt: string;
@@ -58,4 +59,19 @@ export const assignDriver = async (
         `/orders/${orderId}/assign`,
         {driverId});
     return res.data
+}
+
+export const fetchMyCurrentOrder = async () => {
+    const res = await api.get("/orders/my-current");
+    return res.data;
+}
+
+export const acceptOrder = async (orderId: number) => {
+    const res = await api.put(`/orders/${orderId}/accept`);
+    return res.data;
+}
+
+export const rejectOrder = async (orderId: number) => {
+    const res = await api.put(`/orders/${orderId}/reject`);
+    return res.data;
 }

@@ -8,6 +8,8 @@ import {Users} from "../pages/Users.tsx";
 import {Drivers} from "../pages/Drivers.tsx";
 import {CreateOrderPage} from "../pages/CreateOrderPage.tsx";
 import {RoleGuard} from "../api/auth/guards/RoleGuard.tsx";
+import {DriverLayout} from "../layout/DriverLayout.tsx";
+import {DriverDashboard} from "../pages/DriverDashboard.tsx";
 
 export const router = createBrowserRouter([
     // PUBLIC
@@ -52,8 +54,27 @@ export const router = createBrowserRouter([
             },
         ],
     },
+            // DRIVER
+            {
+                element: (
+                    <RoleGuard
+                        allowedRoles={["DRIVER"]}
+                    />
+                ),
 
+                children: [
+                    {
+                        element: <DriverLayout />,
 
+                        children: [
+                            {
+                                path: "/driver",
+                                element: <DriverDashboard />,
+                            },
+                        ],
+                    },
+                ],
+            },
         ],
     },
 ]);
