@@ -79,6 +79,7 @@ public class OrderController {
      * @param dto the completion request data (optional comment)
      * @return the updated order details
      */
+    @PreAuthorize("hasRole('DRIVER')")
     @AuditAction(UserAction.COMPLETE_ORDER)
     @PutMapping("/{orderId}/complete")
     @Operation(summary = "Complete order", description = "Marks an in-progress order as COMPLETED.")
@@ -90,7 +91,7 @@ public class OrderController {
     public OrderResponseDto completeOrder(
             @Parameter(description = "ID of the order", example = "1001")
             @PathVariable Long orderId,
-            @Valid @RequestBody CompleteOrderRequestDto dto
+            @Valid CompleteOrderRequestDto dto
     ) {
         return orderService.completeOrder(orderId, dto);
     }

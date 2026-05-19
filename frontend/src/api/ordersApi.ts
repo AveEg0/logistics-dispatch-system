@@ -75,3 +75,8 @@ export const rejectOrder = async (orderId: number) => {
     const res = await api.put(`/orders/${orderId}/reject`);
     return res.data;
 }
+
+export const completeOrder = async (orderId: number, data?: {comment?: string}) => {
+    const res = await api.put(`/orders/${orderId}/complete`, data ?? {});
+    return res.data;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState} from "react";
-import {acceptOrder, fetchMyCurrentOrder, type Order, rejectOrder} from "../api/ordersApi.ts";
+import {acceptOrder, completeOrder, fetchMyCurrentOrder, type Order, rejectOrder} from "../api/ordersApi.ts";
 import {DriverOrderCard} from "../components/drivers/DriverOrderCard.tsx";
 
 export const DriverDashboard = () => {
@@ -64,6 +64,24 @@ export const DriverDashboard = () => {
         }
     };
 
+    const handleComplete = async () => {
+        if (!order) return;
+
+        const confirmed = window.confirm("Are you sure you want to complete this order?");
+
+        if (!confirmed) return;
+
+        const comment = window.prompt("Optional comment for the driver:");
+
+        try {
+            await completeOrder(order.id, { comment: comment || undefined});
+            reload();
+        } catch (e) {
+            setError("Failed to complete order: " + e);
+            console.error(e);
+        }
+    }
+
     if (loading) {
         return <p>Loading...</p>
     }
@@ -87,7 +105,8 @@ export const DriverDashboard = () => {
             <DriverOrderCard
                 order={order}
                 onAccept={handleAccept}
-                onReject={handleReject}/>
+                onReject={handleReject}
+                onComplete={handleComplete}/>
         </div>
     )
 

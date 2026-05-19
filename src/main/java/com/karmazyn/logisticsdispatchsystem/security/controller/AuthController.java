@@ -44,6 +44,7 @@ public class AuthController {
 
         String refreshToken = cookieUtils.extractRefreshTokenFromCookie(httpRequest);
         LoginResult loginResult = authService.refresh(refreshToken, httpRequest);
+        cookieUtils.setRefreshTokenCookie(response, loginResult.getRefreshToken());
         return new AuthResponse(loginResult.getAccessToken());
     }
 

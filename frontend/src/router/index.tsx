@@ -10,6 +10,8 @@ import {CreateOrderPage} from "../pages/CreateOrderPage.tsx";
 import {RoleGuard} from "../api/auth/guards/RoleGuard.tsx";
 import {DriverLayout} from "../layout/DriverLayout.tsx";
 import {DriverDashboard} from "../pages/DriverDashboard.tsx";
+import {NotFoundPage} from "../pages/NotFoundPage.tsx";
+import {ErrorPage} from "../pages/ErrorPage.tsx";
 
 export const router = createBrowserRouter([
     // PUBLIC
@@ -18,9 +20,15 @@ export const router = createBrowserRouter([
         element: <LoginPage />,
     },
 
+    {
+        path: "*",
+        element: <NotFoundPage />,
+    },
+
     // AUTHENTICATED
     {
         element: <AuthGuard />,
+        errorElement: <ErrorPage />,
         children: [
 
             // ADMIN | DISPATCHER

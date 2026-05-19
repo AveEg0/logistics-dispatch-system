@@ -19,6 +19,11 @@ export const RoleGuard = ({ allowedRoles }: Props) => {
 
     const userRole = user.role;
     if (!allowedRoles.includes(userRole)) {
+        if (userRole === "DRIVER") {
+            console.log("Redirecting to drivers page");
+            return <Navigate to="/driver" replace/>;
+        }
+        console.log("Redirecting to home page");
         return <Navigate to="/" replace/>;
     }
 

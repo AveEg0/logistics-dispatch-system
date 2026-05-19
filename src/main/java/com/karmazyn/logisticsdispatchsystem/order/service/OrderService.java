@@ -20,6 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Service class for managing orders within the logistics dispatch system.
  * Handles order creation, driver assignment, completion, and retrieval.
@@ -290,9 +293,8 @@ public class OrderService {
         Driver driver = driverRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new DriverNotFoundException("Driver not found"));
 
-        Order order = orderRepository.findByDriverId(driver.getId())
-                .orElseThrow(() -> new OrderNotFoundException("No current order found for driver"));
-
-        return orderMapper.toDto(order);
+        Optional<Order> order = orderRepository.findFirstByDriverIdAndStatusIn(driver.getId(),
+                        List.of(OrderStatus.ASSIGNED, OrderStatus.IN_PROGRESS));
+        return order.map(orderMapper::toDto).orElse(null);
     }
 }
