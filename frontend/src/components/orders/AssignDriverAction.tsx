@@ -5,7 +5,7 @@ import {assignDriver} from "../../api/ordersApi.ts";
 type Props = {
     orderId: number;
     drivers: Driver[];
-    onAssigned: () => void;
+    onAssigned: () => Promise<void>;
 };
 
 export const AssignDriverAction = ({
@@ -22,11 +22,12 @@ export const AssignDriverAction = ({
 
             await assignDriver(orderId, Number(selectedDriver));
 
-            onAssigned();
+            await onAssigned();
         } catch (e) {
             console.error("Failed to assign driver:", e);
         } finally {
             setLoading(false);
+            setSelectedDriver('');
         }
     };
 

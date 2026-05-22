@@ -9,7 +9,7 @@ type Props = {
     onSort: (field: string) => void;
     sort: { field: string; direction: "asc" | "desc" };
     drivers: Driver[];
-    onAssigned: () => void;
+    onAssigned: () => Promise<void>;
 };
 
 const cell: React.CSSProperties = { padding: "12px", verticalAlign: "middle" };

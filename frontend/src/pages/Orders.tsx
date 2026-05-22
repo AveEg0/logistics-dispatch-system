@@ -73,20 +73,32 @@ const Orders = () => {
         }
     }, [page, size, sort, filters, debouncedSearch]);
 
+    const loadDrivers = async () => {
+        try {
+            const data = await fetchDrivers(0, DRIVER_SELECT_LIMIT,
+                {field: "name", direction: "asc"}, {status: DRIVER_STATUS_AVAILABLE});
+            startTransition(() => {
+                setDrivers(data.content);
+            })
+        } catch (e) {
+            console.error("Failed to load drivers:", e);
+        }
+
+    };
+
+    const handleAssign = async () => {
+        await loadOrders();
+        await loadDrivers();
+    }
+
     useEffect(() => {
 
         void loadOrders();
+        void loadDrivers();
 
     }, [loadOrders]);
 
-    useEffect(() => {
-        const loadDrivers = async () => {
-            const data = await fetchDrivers(0, DRIVER_SELECT_LIMIT,
-                {field: "name", direction: "asc"}, {status: DRIVER_STATUS_AVAILABLE});
-            setDrivers(data.content);
-        }
-        void loadDrivers();
-    }, []);
+
 
     useEffect(() => {
 
@@ -116,7 +128,7 @@ const Orders = () => {
                 onSort={handleSort}
                 sort={sort}
                 drivers={drivers}
-                onAssigned={loadOrders}
+                onAssigned={handleAssign}
             />
 
             <Pagination

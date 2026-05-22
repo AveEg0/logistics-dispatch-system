@@ -2,6 +2,7 @@ package com.karmazyn.logisticsdispatchsystem.order.controller;
 
 import com.karmazyn.logisticsdispatchsystem.common.audit.annotation.AuditAction;
 import com.karmazyn.logisticsdispatchsystem.common.audit.entity.UserAction;
+import com.karmazyn.logisticsdispatchsystem.n8n.service.WebhookService;
 import com.karmazyn.logisticsdispatchsystem.order.dto.*;
 import com.karmazyn.logisticsdispatchsystem.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final OrderService orderService;
+    private final WebhookService webhookService;
 
     /**
      * Creates a new delivery order.
@@ -69,7 +71,10 @@ public class OrderController {
             @PathVariable Long orderId,
             @Valid @RequestBody AssignDriverRequestDto dto
     ) {
-        return orderService.assignDriver(orderId, dto);
+
+        OrderResponseDto order = orderService.assignDriver(orderId, dto);
+        webhookService.sendOrderAssignedEvent(order);
+        return order;
     }
 
     /**

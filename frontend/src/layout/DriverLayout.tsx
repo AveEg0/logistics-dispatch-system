@@ -1,5 +1,5 @@
-import {logout} from "../api/auth.ts";
 import {Outlet} from "react-router-dom";
+import {Header} from "../components/Header.tsx";
 
 export const DriverLayout = () => {
     return (
@@ -7,11 +7,14 @@ export const DriverLayout = () => {
         height: "100vh"}}>
             <aside style={{ width: "220px", background: "#111", color: "#fff", padding: "20px" }}>
                 <h2>Driver Panel</h2>
-                <button onClick={logout}
-                style={{marginTop: "20px"}}>Logout
-                </button>
             </aside>
-            <main style={{ flex: 1, padding: "24px" }}><Outlet/></main>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                <Header />
+
+                <main style={{ padding: "20px", flex: 1 }}>
+                    <Outlet />
+                </main>
+            </div>
         </div>
     )
  }
