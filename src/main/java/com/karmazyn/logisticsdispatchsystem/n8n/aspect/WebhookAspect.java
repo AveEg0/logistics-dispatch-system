@@ -18,17 +18,17 @@ public class WebhookAspect {
     private final WebhookService webhookService;
 
     @Around("@annotation(webhookEvent)")
-    public Object handleEvent(ProceedingJoinPoint joinPoint, WebhookEvent event) throws Throwable {
+    public Object handleEvent(ProceedingJoinPoint joinPoint, WebhookEvent webhookEvent) throws Throwable {
 
-        log.info(">>> WebhookAspect triggered: {}", event.value());
+        log.info(">>> WebhookAspect triggered: {}", webhookEvent.value());
         Object result = joinPoint.proceed();
 
         try {
 
-            log.info(">>> WebhookAspect firing send for: {}", event.value());
-            webhookService.send(event.value(), result);
+            log.info(">>> WebhookAspect firing send for: {}", webhookEvent.value());
+            webhookService.send(webhookEvent.value(), result);
         } catch (Exception e) {
-            log.warn("Webhook event error [{}]: {}", event.value(), e.getMessage());
+            log.warn("Webhook event error [{}]: {}", webhookEvent.value(), e.getMessage());
         }
 
         return result;
