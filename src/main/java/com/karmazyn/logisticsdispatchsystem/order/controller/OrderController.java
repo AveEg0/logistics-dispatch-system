@@ -2,7 +2,8 @@ package com.karmazyn.logisticsdispatchsystem.order.controller;
 
 import com.karmazyn.logisticsdispatchsystem.common.audit.annotation.AuditAction;
 import com.karmazyn.logisticsdispatchsystem.common.audit.entity.UserAction;
-import com.karmazyn.logisticsdispatchsystem.n8n.service.WebhookService;
+import com.karmazyn.logisticsdispatchsystem.n8n.annotation.WebhookEvent;
+import com.karmazyn.logisticsdispatchsystem.n8n.entity.WebhookEventType;
 import com.karmazyn.logisticsdispatchsystem.order.dto.*;
 import com.karmazyn.logisticsdispatchsystem.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +32,6 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final OrderService orderService;
-    private final WebhookService webhookService;
 
     /**
      * Creates a new delivery order.
@@ -59,6 +59,7 @@ public class OrderController {
      * @return the updated order details
      */
     @AuditAction(UserAction.ASSIGN_DRIVER)
+    @WebhookEvent(WebhookEventType.ORDER_ASSIGNED)
     @PutMapping("/{orderId}/assign")
     @Operation(summary = "Assign driver to order", description = "Manually assigns a driver to a pending order.")
     @ApiResponses(value = {
@@ -72,9 +73,8 @@ public class OrderController {
             @Valid @RequestBody AssignDriverRequestDto dto
     ) {
 
-        OrderResponseDto order = orderService.assignDriver(orderId, dto);
-        webhookService.sendOrderAssignedEvent(order);
-        return order;
+        return orderService.assignDriver(orderId, dto);
+
     }
 
     /**
@@ -86,6 +86,7 @@ public class OrderController {
      */
     @PreAuthorize("hasRole('DRIVER')")
     @AuditAction(UserAction.COMPLETE_ORDER)
+    @WebhookEvent(WebhookEventType.ORDER_COMPLETED)
     @PutMapping("/{orderId}/complete")
     @Operation(summary = "Complete order", description = "Marks an in-progress order as COMPLETED.")
     @ApiResponses(value = {
@@ -109,6 +110,7 @@ public class OrderController {
      * @return the updated order details
      */
     @AuditAction(UserAction.CANCEL_ORDER)
+    @WebhookEvent(WebhookEventType.ORDER_CANCELLED)
     @PutMapping("/{orderId}/cancel")
     @Operation(summary = "Cancel order", description = "Marks an order as CANCELED. This can only be done for orders in certain states.")
     @ApiResponses(value = {

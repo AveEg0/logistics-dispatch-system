@@ -9,6 +9,8 @@ import com.karmazyn.logisticsdispatchsystem.driver.entity.DriverStatus;
 import com.karmazyn.logisticsdispatchsystem.driver.mapper.DriverMapper;
 import com.karmazyn.logisticsdispatchsystem.driver.repository.DriverRepository;
 import com.karmazyn.logisticsdispatchsystem.driver.specification.DriverSpecification;
+import com.karmazyn.logisticsdispatchsystem.n8n.annotation.WebhookEvent;
+import com.karmazyn.logisticsdispatchsystem.n8n.entity.WebhookEventType;
 import com.karmazyn.logisticsdispatchsystem.user.entity.User;
 import com.karmazyn.logisticsdispatchsystem.user.entity.UserRole;
 import com.karmazyn.logisticsdispatchsystem.user.repository.UserRepository;
@@ -69,6 +71,8 @@ public class DriverService {
         return driverMapper.toDto(driver);
     }
 
+
+
     public Page<DriverResponseDto> getDrivers(DriverFilterDto filter, Pageable pageable) {
         Specification<Driver> specification = driverSpecification.withFilter(filter);
         return driverRepository.findAll(specification, pageable)
@@ -89,16 +93,42 @@ public class DriverService {
 
     /**
      * Updates driver status (AVAILABLE, BUSY, OFFLINE, RESERVED).
+     * Accepts and returns DTO
+     * for external use
      */
     @Transactional
     public DriverResponseDto updateDriverStatus(Long driverId, UpdateDriverStatusDto dto) {
 
-        Driver driver = driverRepository.findByIdForUpdate(driverId)
-                .orElseThrow(() -> new DriverNotFoundException("Driver not found"));
-
-        driver.setStatus(dto.getDriverStatus());
+        Driver driver = changeDriverStatus(driverId, dto.getDriverStatus());
 
         return driverMapper.toDto(driver);
+    }
+
+    /**
+     * Updates driver status
+     * for internal use
+     *
+     */
+    @WebhookEvent(WebhookEventType.DRIVER_STATUS_CHANGED)
+    @Transactional
+    public Driver changeDriverStatus(Long driverId, DriverStatus newStatus) {
+        Driver driver = driverRepository.findByIdForUpdate(driverId)
+                .orElseThrow(() -> new DriverNotFoundException("Driver not found"));
+        driver.setStatus(newStatus);
+        driverRepository.save(driver);
+        return driver;
+    }
+
+    /**
+     * Updates driver status
+     * for internal use
+     *
+     */
+    @WebhookEvent(WebhookEventType.DRIVER_STATUS_CHANGED)
+    @Transactional
+    public void changeDriverStatus(Driver driver, DriverStatus newStatus) {
+        driver.setStatus(newStatus);
+        driverRepository.save(driver);
     }
 
     @Transactional

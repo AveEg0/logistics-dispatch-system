@@ -4,6 +4,7 @@ import com.karmazyn.logisticsdispatchsystem.common.exception.*;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.Driver;
 import com.karmazyn.logisticsdispatchsystem.driver.entity.DriverStatus;
 import com.karmazyn.logisticsdispatchsystem.driver.repository.DriverRepository;
+import com.karmazyn.logisticsdispatchsystem.driver.service.DriverService;
 import com.karmazyn.logisticsdispatchsystem.order.dto.*;
 import com.karmazyn.logisticsdispatchsystem.order.entity.Order;
 import com.karmazyn.logisticsdispatchsystem.order.entity.OrderStatus;
@@ -33,6 +34,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final DriverRepository driverRepository;
+    private final DriverService driverService;
     private final OrderMapper orderMapper;
     private final SecurityUtils securityUtils;
     private final OrderSpecification orderSpecification;
@@ -107,8 +109,7 @@ public class OrderService {
         order.setStatus(OrderStatus.ASSIGNED);
 
         // Update driver status
-        driver.setStatus(DriverStatus.RESERVED);
-        driverRepository.save(driver);
+        driverService.changeDriverStatus(driver, DriverStatus.RESERVED);
         orderRepository.save(order);
 
         return orderMapper.toDto(order);
@@ -143,8 +144,8 @@ public class OrderService {
 
         Driver driver = order.getDriver();
         if (driver != null) {
-            driver.setStatus(DriverStatus.AVAILABLE);
-            driverRepository.save(driver);
+            driverService.changeDriverStatus(driver, DriverStatus.AVAILABLE);
+
         }
 
         return orderMapper.toDto(order);
@@ -172,8 +173,7 @@ public class OrderService {
 
         Driver driver = order.getDriver();
         if (driver != null) {
-            driver.setStatus(DriverStatus.BUSY);
-            driverRepository.save(driver);
+            driverService.changeDriverStatus(driver, DriverStatus.BUSY);
         }
 
         return orderMapper.toDto(order);
@@ -208,8 +208,7 @@ public class OrderService {
 
         // driver becomes available again
         if (driver != null) {
-            driver.setStatus(DriverStatus.AVAILABLE);
-            driverRepository.save(driver);
+            driverService.changeDriverStatus(driver, DriverStatus.AVAILABLE);
         }
 
         return orderMapper.toDto(order);
@@ -250,8 +249,7 @@ public class OrderService {
 
         // If driver exists, free him
         if (driver != null) {
-            driver.setStatus(DriverStatus.AVAILABLE);
-            driverRepository.save(driver);
+            driverService.changeDriverStatus(driver, DriverStatus.AVAILABLE);
         }
 
         return orderMapper.toDto(order);

@@ -24,7 +24,7 @@ services:
     build: ./frontend
     container_name: frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
 
   n8n:
     image: n8nio/n8n

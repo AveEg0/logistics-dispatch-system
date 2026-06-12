@@ -1,0 +1,398 @@
+{
+  "name": "logistics-event",
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "7351661638",
+        "text": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1008,
+        -432
+      ],
+      "id": "83129e60-8c85-426e-940e-3f2d6fa2edb4",
+      "name": "Send a text message",
+      "webhookId": "d6f45a63-ca9c-4f96-b213-cf612754e0eb",
+      "credentials": {
+        "telegramApi": {
+          "id": "FV6d5Nz057uF8lkG",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "karmazynoleksandr@gmail.com",
+        "toEmail": "karmazino548@gmail.com",
+        "subject": "Logistics Update",
+        "emailFormat": "text",
+        "text": "={{ $json.message }}",
+        "options": {
+          "allowUnauthorizedCerts": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1056,
+        128
+      ],
+      "id": "a0cc6dac-5401-4a69-a25b-a70cea217b8f",
+      "name": "Send an Email",
+      "webhookId": "8908a701-ed77-46a8-94f2-ab2d333779ab",
+      "credentials": {
+        "smtp": {
+          "id": "J57Nuqw16L6gJIum",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.eventType}}",
+                    "rightValue": "=ORDER_ASSIGNED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "752be55d-757e-47f4-a2c3-9710fb396af0"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5039100d-b370-4838-893b-3aa154cc28c7",
+                    "leftValue": "={{$json.eventType}}",
+                    "rightValue": "=ORDER_COMPLETED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f3d8d62c-1a15-4f22-bbca-fe7662860000",
+                    "leftValue": "={{$json.eventType}}",
+                    "rightValue": "=ORDER_CANCELLED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "44c31bf8-2133-448d-962e-dd526d256e80",
+                    "leftValue": "={{$json.eventType}}",
+                    "rightValue": "=DRIVER_STATUS_CHANGED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        -80
+      ],
+      "id": "b09a851d-3ad2-4502-81eb-35d9efd7ecc6",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a11cc6f0-91a8-44db-b558-765ab069e1b7",
+              "name": "message",
+              "value": "=🚛 New Order assigned!\nOrder ID: {{ $json.body.data.id }}\nDriver Name: {{$json.body.data.driverName}}\nPickup Location: {{$json.body.data.pickupLocation}}\nDelivery Location: {{$json.body.data.deliveryLocation}}\nDescription: {{ $json.body.data.description }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        -336
+      ],
+      "id": "6818dcb4-12ab-42d6-95df-648fc1c0bec8",
+      "name": "ORDER_ASSIGNED"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a11cc6f0-91a8-44db-b558-765ab069e1b7",
+              "name": "message",
+              "value": "=✅ Order Completed\nOrder: {{$json.data.orderId}}\nDriver: {{$json.data.driverName}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        -176
+      ],
+      "id": "08a59fd0-d29d-4a88-8c2f-771b94fd2167",
+      "name": "ORDER_COMPLETED"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a11cc6f0-91a8-44db-b558-765ab069e1b7",
+              "name": "message",
+              "value": "=❌ Order Cancelled \nOrder: {{$json.data.orderId}} \nComment: {{$json.data.comment}}",
+              "type": "string"
+            },
+            {
+              "id": "2c776ccd-4fdf-460a-9f2a-7e085b5134c7",
+              "name": "",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        32
+      ],
+      "id": "f64cb16b-92d5-4192-999a-d09a0bbb7e86",
+      "name": "ORDER_CANCELLED"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a11cc6f0-91a8-44db-b558-765ab069e1b7",
+              "name": "message",
+              "value": "=👤 Driver Status\nUpdated Driver: {{$json.data.driverName}}\nStatus: {{$json.data.driverStatus}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        208
+      ],
+      "id": "c6529dcf-0b57-45e0-80d0-1e84fcdd4db3",
+      "name": "DRIVER_STATUS_CHANGED"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "http://localhost:5678/webhook-test/logistics-event",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        -48
+      ],
+      "id": "2f4f74ca-35ea-48ef-9f55-cd5680d477dd",
+      "name": "Webhook logistics-event",
+      "webhookId": "2300ebe3-8285-4147-b64c-479646971d8b"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "ORDER_ASSIGNED",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ORDER_COMPLETED",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ORDER_CANCELLED",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DRIVER_STATUS_CHANGED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ORDER_ASSIGNED": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook logistics-event": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ORDER_COMPLETED": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ORDER_CANCELLED": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DRIVER_STATUS_CHANGED": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "18b30315-faff-4b01-8280-59b6e2fc5683",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cbe18608eab3202cc568d8a58c0940b583fe5a39fcad559b554e2394a4d4f0ab"
+  },
+  "id": "lOH9NtLXUnUGLak6",
+  "tags": []
+}

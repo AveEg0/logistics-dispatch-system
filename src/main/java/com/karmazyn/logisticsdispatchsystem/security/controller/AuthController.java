@@ -10,10 +10,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/auth")
@@ -43,6 +45,9 @@ public class AuthController {
             HttpServletResponse response) {
 
         String refreshToken = cookieUtils.extractRefreshTokenFromCookie(httpRequest);
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is empty");
+        }
         LoginResult loginResult = authService.refresh(refreshToken, httpRequest);
         cookieUtils.setRefreshTokenCookie(response, loginResult.getRefreshToken());
         return new AuthResponse(loginResult.getAccessToken());
