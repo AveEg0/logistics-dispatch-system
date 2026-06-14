@@ -306,7 +306,7 @@ The `@Async` annotation ensures the webhook call runs on a separate thread pool 
 
 | Variable | Description |
 |---|---|
-| `WEBHOOK_ORDER_ASSIGNED_URL` | Full n8n webhook URL, e.g. `http://n8n:5678/webhook/order-assigned` |
+| `WEBHOOK_LOGISTICS_EVENT_URL` | Full n8n webhook URL, e.g. `http://n8n:5678/webhook/logistics-event` |
 
 ---
 
@@ -367,7 +367,7 @@ JWT_ACCESS_EXPIRATION_TIME=15m
 JWT_REFRESH_EXPIRATION_TIME=7d
 
 # n8n Webhook
-WEBHOOK_ORDER_ASSIGNED_URL=http://localhost:5678/webhook/order-assigned
+WEBHOOK_LOGISTICS_EVENT_URL=http://localhost:5678/webhook/logistics-event
 ```
 
 ### Docker Compose (passed via environment section)
@@ -381,7 +381,7 @@ DB_PASSWORD=postgres
 JWT_SECRET_KEY=your-secret-key
 JWT_ACCESS_EXPIRATION_TIME=15m
 JWT_REFRESH_EXPIRATION_TIME=7d
-WEBHOOK_ORDER_ASSIGNED_URL=http://n8n:5678/webhook/order-assigned
+WEBHOOK_LOGISTICS_EVENT_URL=http://n8n:5678/webhook/logistics-event
 ```
 
 ---
@@ -594,7 +594,6 @@ curl -X PUT http://localhost:8080/orders/1/assign \
 ## 🔮 Future Improvements
 
 - WebSocket/SSE updates
-- Integration tests with Testcontainers
 - Metrics & observability
 - Kafka-based event processing
 - Map integration

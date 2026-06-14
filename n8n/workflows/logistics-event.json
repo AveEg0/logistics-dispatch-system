@@ -64,7 +64,7 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{$json.eventType}}",
+                    "leftValue": "={{$json.body.EventType}}",
                     "rightValue": "=ORDER_ASSIGNED",
                     "operator": {
                       "type": "string",
@@ -87,7 +87,7 @@
                 "conditions": [
                   {
                     "id": "5039100d-b370-4838-893b-3aa154cc28c7",
-                    "leftValue": "={{$json.eventType}}",
+                    "leftValue": "={{$json.body.EventType}}",
                     "rightValue": "=ORDER_COMPLETED",
                     "operator": {
                       "type": "string",
@@ -110,7 +110,7 @@
                 "conditions": [
                   {
                     "id": "f3d8d62c-1a15-4f22-bbca-fe7662860000",
-                    "leftValue": "={{$json.eventType}}",
+                    "leftValue": "={{$json.body.EventType}}",
                     "rightValue": "=ORDER_CANCELLED",
                     "operator": {
                       "type": "string",
@@ -133,7 +133,7 @@
                 "conditions": [
                   {
                     "id": "44c31bf8-2133-448d-962e-dd526d256e80",
-                    "leftValue": "={{$json.eventType}}",
+                    "leftValue": "={{$json.body.EventType}}",
                     "rightValue": "=DRIVER_STATUS_CHANGED",
                     "operator": {
                       "type": "string",
@@ -165,7 +165,7 @@
             {
               "id": "a11cc6f0-91a8-44db-b558-765ab069e1b7",
               "name": "message",
-              "value": "=🚛 New Order assigned!\nOrder ID: {{ $json.body.data.id }}\nDriver Name: {{$json.body.data.driverName}}\nPickup Location: {{$json.body.data.pickupLocation}}\nDelivery Location: {{$json.body.data.deliveryLocation}}\nDescription: {{ $json.body.data.description }}",
+              "value": "=🚛 New Order assigned!\nOrder ID: {{ $json.body.Data.id }}\nDriver Name: {{$json.body.Data.driverName}}\nPickup Location: {{$json.body.Data.pickupLocation}}\nDelivery Location: {{$json.body.Data.deliveryLocation}}\nDescription: {{ $json.body.Data.description }}",
               "type": "string"
             }
           ]
@@ -259,7 +259,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "http://localhost:5678/webhook-test/logistics-event",
+        "path": "logistics-event",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
@@ -388,7 +388,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "18b30315-faff-4b01-8280-59b6e2fc5683",
+  "versionId": "afecd4be-4ab8-4eee-8380-937410408e26",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "cbe18608eab3202cc568d8a58c0940b583fe5a39fcad559b554e2394a4d4f0ab"
